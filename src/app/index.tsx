@@ -16,7 +16,9 @@ export default function HomeScreen() {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [aprilResponse, setAprilResponse] = useState("");
+
   const pulse = useRef(new Animated.Value(1)).current;
+  const latestTranscript = useRef("");
 
   useEffect(() => {
     const animation = Animated.loop(
@@ -43,24 +45,22 @@ export default function HomeScreen() {
     setIsListening(true);
   });
 
-  useSpeechRecognitionEvent("end", () => {
-    setIsListening(false);
+  useSpeechRecognitionEvent("result", (event) => {
+    const text = event.results?.[0]?.transcript ?? "";
+
+    latestTranscript.current = text;
+    setTranscript(text);
   });
 
-  useSpeechRecognitionEvent("result", (event) => {
-  const text = event.results?.[0]?.transcript ?? "";
-  setTranscript(text);
-});
+  useSpeechRecognitionEvent("end", () => {
+    setIsListening(false);
 
-useSpeechRecognitionEvent("end", () => {
-  setIsListening(false);
-
-  if (transcript.trim()) {
-    setAprilResponse(
-      "Thank you for telling me. I’m here to listen."
-    );
-  }
-});
+    if (latestTranscript.current.trim()) {
+      setAprilResponse(
+        "Thank you for telling me. I’m here to listen."
+      );
+    }
+  });
 
   useSpeechRecognitionEvent("error", (event) => {
     console.log("Speech recognition error:", event.error);
@@ -68,15 +68,17 @@ useSpeechRecognitionEvent("end", () => {
   });
 
   const startListening = async () => {
-    const result =
+    const permission =
       await ExpoSpeechRecognitionModule.requestPermissionsAsync();
 
-    if (!result.granted) {
+    if (!permission.granted) {
       console.log("Speech recognition permission was not granted.");
       return;
     }
 
     setTranscript("");
+    setAprilResponse("");
+    latestTranscript.current = "";
 
     ExpoSpeechRecognitionModule.start({
       lang: "en-US",
@@ -138,42 +140,24 @@ useSpeechRecognitionEvent("end", () => {
         </Text>
 
         {transcript.length > 0 && (
-  <View style={styles.transcriptBox}>
-    <Text style={styles.transcriptLabel}>I heard:</Text>
-    <Text style={styles.transcript}>
-      {transcript}
-    </Text>
-  </View>
-)}
+          <View style={styles.transcriptBox}>
+            <Text style={styles.transcriptLabel}>I heard:</Text>
 
-{aprilResponse.length > 0 && (
-  <View style={styles.responseBox}>
-    <Text style={styles.responseLabel}>APRIL</Text>
-    <Text style={styles.response}>
-      {aprilResponse}
-    </Text>
-  </View>
-)}responseBox: {
-  width: "100%",
-  maxWidth: 420,
-  padding: 18,
-  borderRadius: 18,
-  backgroundColor: "#1B202C",
-  marginBottom: 24,
-},
+            <Text style={styles.transcript}>
+              {transcript}
+            </Text>
+          </View>
+        )}
 
-responseLabel: {
-  color: "#E8A33D",
-  fontSize: 13,
-  fontWeight: "700",
-  marginBottom: 6,
-},
+        {aprilResponse.length > 0 && (
+          <View style={styles.responseBox}>
+            <Text style={styles.responseLabel}>APRIL</Text>
 
-response: {
-  color: "#FFFFFF",
-  fontSize: 17,
-  lineHeight: 25,
-},
+            <Text style={styles.response}>
+              {aprilResponse}
+            </Text>
+          </View>
+        )}
 
         <Pressable
           style={({ pressed }) => [
@@ -281,7 +265,7 @@ const styles = StyleSheet.create({
     padding: 18,
     borderRadius: 18,
     backgroundColor: "#151A24",
-    marginBottom: 24,
+    marginBottom: 16,
   },
 
   transcriptLabel: {
@@ -292,6 +276,28 @@ const styles = StyleSheet.create({
   },
 
   transcript: {
+    color: "#FFFFFF",
+    fontSize: 17,
+    lineHeight: 25,
+  },
+
+  responseBox: {
+    width: "100%",
+    maxWidth: 420,
+    padding: 18,
+    borderRadius: 18,
+    backgroundColor: "#1B202C",
+    marginBottom: 24,
+  },
+
+  responseLabel: {
+    color: "#E8A33D",
+    fontSize: 13,
+    fontWeight: "700",
+    marginBottom: 6,
+  },
+
+  response: {
     color: "#FFFFFF",
     fontSize: 17,
     lineHeight: 25,
