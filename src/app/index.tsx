@@ -157,7 +157,12 @@ export default function HomeScreen() {
         const key = checkInQuestions[checkInStepRef.current]?.key;
         if (key) {
           setCheckInAnswers((current) => ({ ...current, [key]: spoken }));
-          setCheckInMessage("I heard you. Review the answer, then continue when you’re ready.");
+          setCheckInMessage("I heard you. Let me think about that…");
+          const reply = await askApril(spoken, [
+            { role: "user", content: spoken },
+            { role: "assistant", content: checkInQuestions[checkInStepRef.current]?.title ?? "" },
+          ]);
+          setCheckInMessage(reply);
         }
       } else {
         setCheckInMessage("I didn’t catch that. You can try again or type your answer.");
@@ -166,7 +171,10 @@ export default function HomeScreen() {
     }
 
     if (spoken) {
-      setAprilResponse("Thank you for telling me. I’m here to listen.");
+      setAprilResponse("Thinking…");
+      askApril(spoken, transcript ? [{ role: "user", content: transcript }] : []).then((reply) => {
+        setAprilResponse(reply);
+      });
     }
   });
 
@@ -260,6 +268,17 @@ export default function HomeScreen() {
     setProfileName(displayName.trim());
     setNeedsOnboarding(false);
     setAuthBusy(false);
+  };
+
+  const askApril = async (message: string, context: { role: string; content: string }[] = []) => {
+    const { data, error } = await supabase.functions.invoke("april-conversation", {
+      body: { message, context },
+    });
+    if (error) {
+      console.log("APRIL conversation error:", error.message);
+      return "I’m here with you. I can still record what you share.";
+    }
+    return data?.reply ?? "I’m listening. Tell me a little more.";
   };
 
   const startListening = async () => {
