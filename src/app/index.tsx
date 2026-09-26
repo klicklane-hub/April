@@ -199,48 +199,53 @@ export default function HomeScreen() {
     setAuthBusy(true);
     setAuthMessage("");
 
-    if (authMode === "signup") {
-      const { data, error } = await supabase.auth.signUp({
-        email: cleanEmail,
-        password,
-      });
-
-      if (error) {
-        setAuthMessage(error.message);
-        setAuthBusy(false);
-        return;
-      }
-
-      if (data.user && data.session) {
-        const { error: profileError } = await supabase.from("profiles").insert({
-          id: data.user.id,
-          display_name: displayName.trim(),
-          preferred_language: "en",
-          voice_preference: "calm",
+    try {
+      if (authMode === "signup") {
+        const { data, error } = await supabase.auth.signUp({
+          email: cleanEmail,
+          password,
         });
 
-        if (profileError) {
-          console.log("APRIL profile creation error:", profileError.message);
+        if (error) {
+          setAuthMessage(error.message);
+          return;
+        }
+
+        if (data.user && data.session) {
+          const { error: profileError } = await supabase.from("profiles").insert({
+            id: data.user.id,
+            display_name: displayName.trim(),
+            preferred_language: "en",
+            voice_preference: "calm",
+          });
+
+          if (profileError) {
+            console.log("APRIL profile creation error:", profileError.message);
+          }
+        }
+
+        setAuthMessage(
+          data.session
+            ? "Your APRIL account is ready."
+            : "Check your email to confirm your account, then come back to sign in."
+        );
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: cleanEmail,
+          password,
+        });
+
+        if (error) {
+          setAuthMessage(error.message);
         }
       }
-
-      setAuthMessage(
-        data.session
-          ? "Your APRIL account is ready."
-          : "Check your email to confirm your account, then come back to sign in."
-      );
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: cleanEmail,
-        password,
-      });
-
-      if (error) {
-        setAuthMessage(error.message);
-      }
+    } catch (error: any) {
+      const detail = error?.message || String(error);
+      console.log("APRIL authentication exception:", detail);
+      setAuthMessage(`Connection error: ${detail}`);
+    } finally {
+      setAuthBusy(false);
     }
-
-    setAuthBusy(false);
   };
 
   const finishOnboarding = async () => {
