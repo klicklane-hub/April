@@ -175,12 +175,23 @@ export default function HomeScreen() {
     setTranscript(text);
   });
 
+  const speakAprilResponse = (text: string) => {
+    if (Platform.OS !== "web" || typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.92;
+    utterance.pitch = 1.02;
+    utterance.volume = 1;
+    window.speechSynthesis.speak(utterance);
+  };
+
   useSpeechRecognitionEvent("end", async () => {
     setIsListening(false);
     const spoken = latestTranscript.current.trim();
 
     if (checkInVoiceActive.current) {
       checkInVoiceActive.current = false;
+      ExpoSpeechRecognitionModule.stop();
       if (spoken) {
         const key = checkInQuestions[checkInStepRef.current]?.key;
         if (key) {
@@ -191,6 +202,7 @@ export default function HomeScreen() {
             { role: "assistant", content: checkInQuestions[checkInStepRef.current]?.title ?? "" },
           ]);
           setCheckInMessage(reply);
+          speakAprilResponse(reply);
         }
       } else {
         setCheckInMessage("I didn’t catch that. You can try again or type your answer.");
@@ -598,6 +610,9 @@ export default function HomeScreen() {
   };
 
   const startConversationalCheckIn = () => {
+    if (Platform.OS === "web" && typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
     setCheckInMessage("APRIL is asking…");
     const question = checkInQuestions[checkInStepRef.current];
     speakCheckInQuestion(question.title, () => {
@@ -606,6 +621,9 @@ export default function HomeScreen() {
   };
 
   const startCheckInVoice = async () => {
+    if (Platform.OS === "web" && typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
     const permission = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
     if (!permission.granted) {
       Alert.alert("Microphone permission needed", "APRIL needs microphone access when you choose to answer by voice.");
