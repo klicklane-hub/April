@@ -117,6 +117,34 @@ export default function HomeScreen() {
     checkInStepRef.current = checkInStep;
   }, [checkInStep]);
 
+  const loadHealthData = async () => {
+    if (!sessionUser) return;
+    setHealthLoading(true);
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    const { data: checkIn } = await supabase
+      .from("check_ins")
+      .select("id, overall_feeling, sleep_hours, energy_level, emotional_state, physical_concerns, checked_in_at")
+      .eq("user_id", sessionUser.id)
+      .gte("checked_in_at", start.toISOString())
+      .order("checked_in_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const { data: entries } = await supabase
+      .from("health_entries")
+      .select("id, category, title, content, severity, occurred_at, created_at")
+      .eq("user_id", sessionUser.id)
+      .order("occurred_at", { ascending: false })
+      .limit(30);
+    setTodayCheckIn(checkIn ?? null);
+    setHealthEntries(entries ?? []);
+    setHealthLoading(false);
+  };
+
+  useEffect(() => {
+    if (sessionUser && profileReady) loadHealthData();
+  }, [sessionUser?.id, profileReady]);
+
   useEffect(() => {
     const animation = Animated.loop(
       Animated.sequence([
@@ -489,34 +517,6 @@ export default function HomeScreen() {
       </SafeAreaView>
     );
   }
-
-  const loadHealthData = async () => {
-    if (!sessionUser) return;
-    setHealthLoading(true);
-    const start = new Date();
-    start.setHours(0, 0, 0, 0);
-    const { data: checkIn } = await supabase
-      .from("check_ins")
-      .select("id, overall_feeling, sleep_hours, energy_level, emotional_state, physical_concerns, checked_in_at")
-      .eq("user_id", sessionUser.id)
-      .gte("checked_in_at", start.toISOString())
-      .order("checked_in_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    const { data: entries } = await supabase
-      .from("health_entries")
-      .select("id, category, title, content, severity, occurred_at, created_at")
-      .eq("user_id", sessionUser.id)
-      .order("occurred_at", { ascending: false })
-      .limit(30);
-    setTodayCheckIn(checkIn ?? null);
-    setHealthEntries(entries ?? []);
-    setHealthLoading(false);
-  };
-
-  useEffect(() => {
-    if (sessionUser && profileReady) loadHealthData();
-  }, [sessionUser?.id, profileReady]);
 
   const checkInQuestions = [
     { key: "overallFeeling", title: "How are you feeling overall?", placeholder: "Tell me in your own words…" },
