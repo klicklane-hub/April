@@ -50,6 +50,8 @@ export default function HomeScreen() {
 
   const pulse = useRef(new Animated.Value(1)).current;
   const latestTranscript = useRef("");
+  const checkInVoiceActive = useRef(false);
+  const checkInStepRef = useRef(0);
 
   useEffect(() => {
     let mounted = true;
@@ -112,6 +114,10 @@ export default function HomeScreen() {
   }, [sessionUser]);
 
   useEffect(() => {
+    checkInStepRef.current = checkInStep;
+  }, [checkInStep]);
+
+  useEffect(() => {
     const animation = Animated.loop(
       Animated.sequence([
         Animated.timing(pulse, {
@@ -143,8 +149,23 @@ export default function HomeScreen() {
 
   useSpeechRecognitionEvent("end", () => {
     setIsListening(false);
+    const spoken = latestTranscript.current.trim();
 
-    if (latestTranscript.current.trim()) {
+    if (checkInVoiceActive.current) {
+      checkInVoiceActive.current = false;
+      if (spoken) {
+        const key = checkInQuestions[checkInStepRef.current]?.key;
+        if (key) {
+          setCheckInAnswers((current) => ({ ...current, [key]: spoken }));
+          setCheckInMessage("I heard you. Review the answer, then continue when you’re ready.");
+        }
+      } else {
+        setCheckInMessage("I didn’t catch that. You can try again or type your answer.");
+      }
+      return;
+    }
+
+    if (spoken) {
       setAprilResponse("Thank you for telling me. I’m here to listen.");
     }
   });
@@ -537,6 +558,23 @@ export default function HomeScreen() {
     await loadHealthData();
   };
 
+  const startCheckInVoice = async () => {
+    const permission = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert("Microphone permission needed", "APRIL needs microphone access when you choose to answer by voice.");
+      return;
+    }
+    checkInVoiceActive.current = true;
+    latestTranscript.current = "";
+    setTranscript("");
+    setCheckInMessage("Listening…");
+    ExpoSpeechRecognitionModule.start({
+      lang: "en-US",
+      interimResults: true,
+      continuous: false,
+    });
+  };
+
   const nextCheckInStep = async () => {
     const key = checkInQuestions[checkInStep].key;
     if (!checkInAnswers[key].trim()) {
@@ -577,6 +615,14 @@ export default function HomeScreen() {
           <Text style={styles.checkInStepText}>{checkInStep + 1} of {checkInQuestions.length}</Text>
           <Text style={styles.checkInQuestion}>{question.title}</Text>
           <Text style={styles.checkInPrompt}>There’s no perfect answer. Just tell me what feels true right now.</Text>
+          <Pressable
+            style={[styles.voiceAnswerButton, isListening && styles.voiceAnswerButtonActive]}
+            onPress={startCheckInVoice}
+            disabled={isListening || checkInSaving}
+          >
+            <Text style={styles.voiceAnswerIcon}>◉</Text>
+            <Text style={styles.voiceAnswerText}>{isListening ? "Listening…" : "Answer by voice"}</Text>
+          </Pressable>
           <TextInput style={styles.checkInInput} placeholder={question.placeholder} placeholderTextColor="#777D89" value={value} onChangeText={updateCheckInAnswer} multiline={question.key !== "sleepHours" && question.key !== "energyLevel"} keyboardType={question.key === "sleepHours" || question.key === "energyLevel" ? "decimal-pad" : "default"} />
           {checkInMessage ? <Text style={styles.checkInMessage}>{checkInMessage}</Text> : null}
           <View style={styles.checkInActions}>
@@ -1250,6 +1296,10 @@ const styles = StyleSheet.create({
 
   settingValue: { color: "#FFFFFF", fontSize: 15, marginTop: 8 },
 
+  voiceAnswerButton: { marginTop: 14, minHeight: 52, borderRadius: 16, borderWidth: 1, borderColor: "#343C4B", backgroundColor: "#111620", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 9 },
+  voiceAnswerButtonActive: { borderColor: "#E8A33D", backgroundColor: "#171A20" },
+  voiceAnswerIcon: { color: "#E8A33D", fontSize: 14 },
+  voiceAnswerText: { color: "#D7DAE0", fontSize: 15, fontWeight: "600" },
   checkInContent: { flexGrow: 1, paddingHorizontal: 22, paddingTop: 28, paddingBottom: 110 },
   progressRow: { flexDirection: "row", gap: 6, marginTop: 8, marginBottom: 8 },
   progressDot: { width: 28, height: 4, borderRadius: 2, backgroundColor: "#252C39" },
