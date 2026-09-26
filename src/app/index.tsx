@@ -25,6 +25,8 @@ export default function HomeScreen() {
   const [sessionReady, setSessionReady] = useState(false);
   const [sessionUser, setSessionUser] = useState<any>(null);
   const [profileReady, setProfileReady] = useState(false);
+  const [profileName, setProfileName] = useState("");
+  const [activeTab, setActiveTab] = useState<"home" | "talk" | "health" | "insights" | "me">("home");
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
 
   const [authMode, setAuthMode] = useState<AuthMode>("signin");
@@ -89,6 +91,7 @@ export default function HomeScreen() {
         return;
       }
 
+      setProfileName(data?.display_name ?? "");
       setNeedsOnboarding(!data);
       setProfileReady(true);
     };
@@ -225,6 +228,7 @@ export default function HomeScreen() {
       return;
     }
 
+    setProfileName(displayName.trim());
     setNeedsOnboarding(false);
     setAuthBusy(false);
   };
@@ -433,9 +437,215 @@ export default function HomeScreen() {
     );
   }
 
+  const renderHome = () => (
+    <ScrollView contentContainerStyle={styles.dashboardContent}>
+      <View style={styles.dashboardHeader}>
+        <View>
+          <Text style={styles.eyebrow}>TODAY</Text>
+          <Text style={styles.greeting}>Hi{profileName ? `, ${profileName}` : ""}.</Text>
+        </View>
+        <View style={styles.statusDot} />
+      </View>
+
+      <Text style={styles.question}>How are you feeling today?</Text>
+      <Text style={styles.dashboardSubtitle}>
+        You don’t have to fill anything out. Just talk to APRIL.
+      </Text>
+
+      <Pressable style={styles.talkCard} onPress={() => setActiveTab("talk")}>
+        <View style={styles.smallCompanion}>
+          <View style={styles.smallEyeRow}>
+            <View style={styles.smallEye} />
+            <View style={styles.smallEye} />
+          </View>
+        </View>
+        <View style={styles.talkCardText}>
+          <Text style={styles.talkCardTitle}>Talk to me</Text>
+          <Text style={styles.talkCardSubtitle}>Tell me how you’re doing.</Text>
+        </View>
+        <Text style={styles.chevron}>›</Text>
+      </Pressable>
+
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>Today</Text>
+        <Text style={styles.sectionHint}>Your health, at a glance</Text>
+      </View>
+
+      <View style={styles.snapshotRow}>
+        <View style={styles.snapshotCard}>
+          <Text style={styles.snapshotIcon}>◷</Text>
+          <Text style={styles.snapshotTitle}>Sleep</Text>
+          <Text style={styles.snapshotValue}>Not recorded</Text>
+        </View>
+        <View style={styles.snapshotCard}>
+          <Text style={styles.snapshotIcon}>✦</Text>
+          <Text style={styles.snapshotTitle}>Energy</Text>
+          <Text style={styles.snapshotValue}>Not recorded</Text>
+        </View>
+      </View>
+
+      <Pressable style={styles.checkInCard} onPress={() => setActiveTab("talk")}>
+        <View>
+          <Text style={styles.checkInLabel}>DAILY CHECK-IN</Text>
+          <Text style={styles.checkInTitle}>Take a moment for yourself.</Text>
+          <Text style={styles.checkInSubtitle}>
+            A short conversation can help you notice how you’re doing.
+          </Text>
+        </View>
+        <Text style={styles.checkInArrow}>→</Text>
+      </Pressable>
+
+      <View style={styles.insightCard}>
+        <Text style={styles.insightLabel}>APRIL’S NOTE</Text>
+        <Text style={styles.insightText}>
+          As you use APRIL, I’ll help you notice changes from your own baseline — not compare you to someone else.
+        </Text>
+      </View>
+    </ScrollView>
+  );
+
+  const renderTalk = () => (
+    <ScrollView contentContainerStyle={styles.talkContent}>
+      <Text style={styles.screenEyebrow}>TALK</Text>
+      <Text style={styles.screenTitle}>I’m here.</Text>
+      <Text style={styles.screenSubtitle}>
+        Tell me what’s on your mind or how you’re feeling.
+      </Text>
+
+      <Animated.View
+        style={[styles.companionGlow, { transform: [{ scale: pulse }] }]}
+      >
+        <View style={styles.companion}>
+          <View style={styles.eyes}>
+            <View style={styles.eye} />
+            <View style={styles.eye} />
+          </View>
+          <View style={[styles.mouth, isListening && styles.listeningMouth]} />
+        </View>
+      </Animated.View>
+
+      {transcript.length > 0 && (
+        <View style={styles.transcriptBox}>
+          <Text style={styles.transcriptLabel}>I heard:</Text>
+          <Text style={styles.transcript}>{transcript}</Text>
+        </View>
+      )}
+
+      {aprilResponse.length > 0 && (
+        <View style={styles.responseBox}>
+          <Text style={styles.responseLabel}>APRIL</Text>
+          <Text style={styles.response}>{aprilResponse}</Text>
+        </View>
+      )}
+
+      <Pressable
+        style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
+        onPress={handleTalk}
+      >
+        <Text style={styles.buttonText}>{isListening ? "I’m done" : "Talk to me"}</Text>
+      </Pressable>
+    </ScrollView>
+  );
+
+  const renderHealth = () => (
+    <ScrollView contentContainerStyle={styles.dashboardContent}>
+      <Text style={styles.screenEyebrow}>MY HEALTH</Text>
+      <Text style={styles.screenTitle}>Your story, over time.</Text>
+      <Text style={styles.screenSubtitle}>
+        Things you choose to record will appear here in chronological order.
+      </Text>
+      <View style={styles.emptyCard}>
+        <Text style={styles.emptyTitle}>Nothing recorded yet.</Text>
+        <Text style={styles.emptyText}>
+          Start with a conversation. APRIL can turn what you tell her into useful health records you can review later.
+        </Text>
+        <Pressable style={styles.secondaryButton} onPress={() => setActiveTab("talk")}>
+          <Text style={styles.secondaryButtonText}>Start a conversation</Text>
+        </Pressable>
+      </View>
+    </ScrollView>
+  );
+
+  const renderInsights = () => (
+    <ScrollView contentContainerStyle={styles.dashboardContent}>
+      <Text style={styles.screenEyebrow}>INSIGHTS</Text>
+      <Text style={styles.screenTitle}>Patterns, not diagnoses.</Text>
+      <Text style={styles.screenSubtitle}>
+        APRIL will only show observations based on information you’ve recorded.
+      </Text>
+      <View style={styles.emptyCard}>
+        <Text style={styles.emptyTitle}>Your baseline is just beginning.</Text>
+        <Text style={styles.emptyText}>
+          After you’ve shared enough information, APRIL can help you notice changes in sleep, energy, mood and other areas you choose to track.
+        </Text>
+      </View>
+    </ScrollView>
+  );
+
+  const renderMe = () => (
+    <ScrollView contentContainerStyle={styles.dashboardContent}>
+      <Text style={styles.screenEyebrow}>ME</Text>
+      <Text style={styles.screenTitle}>You’re in control.</Text>
+      <Text style={styles.screenSubtitle}>
+        Manage your account, preferences and privacy.
+      </Text>
+
+      <View style={styles.settingsCard}>
+        <Text style={styles.settingLabel}>ACCOUNT</Text>
+        <Text style={styles.settingValue}>{sessionUser.email}</Text>
+      </View>
+
+      <View style={styles.settingsCard}>
+        <Text style={styles.settingLabel}>COMPANION</Text>
+        <Text style={styles.settingValue}>Calm voice · English</Text>
+      </View>
+
+      <View style={styles.settingsCard}>
+        <Text style={styles.settingLabel}>PRIVACY</Text>
+        <Text style={styles.settingValue}>Your health information belongs to you.</Text>
+      </View>
+
+      <Pressable style={styles.signOutButton} onPress={() => supabase.auth.signOut()}>
+        <Text style={styles.signOutText}>Sign out</Text>
+      </Pressable>
+    </ScrollView>
+  );
+
+  const renderActiveScreen = () => {
+    if (activeTab === "home") return renderHome();
+    if (activeTab === "talk") return renderTalk();
+    if (activeTab === "health") return renderHealth();
+    if (activeTab === "insights") return renderInsights();
+    return renderMe();
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
+      <View style={styles.appShell}>
+        {renderActiveScreen()}
+        <View style={styles.tabBar}>
+          {[
+            ["home", "Home"],
+            ["talk", "Talk"],
+            ["health", "My Health"],
+            ["insights", "Insights"],
+            ["me", "Me"],
+          ].map(([key, label]) => (
+            <Pressable
+              key={key}
+              style={styles.tab}
+              onPress={() => setActiveTab(key as typeof activeTab)}
+            >
+              <View style={[styles.tabMark, activeTab === key && styles.tabMarkActive]} />
+              <Text style={[styles.tabLabel, activeTab === key && styles.tabLabelActive]}>
+                {label}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      </View>
+    </SafeAreaView>
+  );
         <Text style={styles.logo}>APRIL</Text>
 
         <Animated.View
@@ -749,6 +959,227 @@ const styles = StyleSheet.create({
 
   response: { color: "#FFFFFF", fontSize: 17, lineHeight: 25 },
 
-  signOutButton: { marginTop: 18, padding: 10 },
+  signOutButton: { marginTop: 18, padding: 10, alignItems: "center" },
   signOutText: { color: "#777D89", fontSize: 13 },
+
+  appShell: { flex: 1 },
+
+  dashboardContent: {
+    paddingHorizontal: 22,
+    paddingTop: 28,
+    paddingBottom: 110,
+  },
+
+  dashboardHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 28,
+  },
+
+  eyebrow: { color: "#777D89", fontSize: 11, fontWeight: "700", letterSpacing: 2 },
+
+  greeting: {
+    color: "#FFFFFF",
+    fontSize: 30,
+    fontWeight: "600",
+    marginTop: 5,
+  },
+
+  statusDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#8ED6B1",
+  },
+
+  question: {
+    color: "#FFFFFF",
+    fontSize: 27,
+    fontWeight: "600",
+    lineHeight: 34,
+    marginBottom: 8,
+  },
+
+  dashboardSubtitle: {
+    color: "#A7ACB8",
+    fontSize: 15,
+    lineHeight: 23,
+    marginBottom: 22,
+  },
+
+  talkCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#171D28",
+    borderRadius: 22,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: "#252C39",
+  },
+
+  smallCompanion: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    backgroundColor: "#E8A33D",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  smallEyeRow: { flexDirection: "row", gap: 10 },
+
+  smallEye: {
+    width: 7,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#0B0E14",
+  },
+
+  talkCardText: { flex: 1, marginLeft: 15 },
+
+  talkCardTitle: { color: "#FFFFFF", fontSize: 17, fontWeight: "700" },
+
+  talkCardSubtitle: { color: "#A7ACB8", fontSize: 13, marginTop: 4 },
+
+  chevron: { color: "#E8A33D", fontSize: 28, marginLeft: 8 },
+
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    marginTop: 30,
+    marginBottom: 12,
+  },
+
+  sectionTitle: { color: "#FFFFFF", fontSize: 18, fontWeight: "600" },
+
+  sectionHint: { color: "#777D89", fontSize: 12 },
+
+  snapshotRow: { flexDirection: "row", gap: 12 },
+
+  snapshotCard: {
+    flex: 1,
+    backgroundColor: "#151A24",
+    borderRadius: 18,
+    padding: 16,
+    minHeight: 112,
+  },
+
+  snapshotIcon: { color: "#E8A33D", fontSize: 19, marginBottom: 10 },
+
+  snapshotTitle: { color: "#FFFFFF", fontSize: 14, fontWeight: "600" },
+
+  snapshotValue: { color: "#777D89", fontSize: 12, marginTop: 8 },
+
+  checkInCard: {
+    backgroundColor: "#211F1A",
+    borderRadius: 20,
+    padding: 18,
+    marginTop: 14,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  checkInLabel: { color: "#E8A33D", fontSize: 10, fontWeight: "800", letterSpacing: 1.5 },
+
+  checkInTitle: { color: "#FFFFFF", fontSize: 17, fontWeight: "600", marginTop: 7 },
+
+  checkInSubtitle: { color: "#A7ACB8", fontSize: 12, lineHeight: 18, marginTop: 5, paddingRight: 12 },
+
+  checkInArrow: { color: "#E8A33D", fontSize: 24 },
+
+  insightCard: {
+    backgroundColor: "#151A24",
+    borderRadius: 20,
+    padding: 18,
+    marginTop: 14,
+    borderWidth: 1,
+    borderColor: "#252C39",
+  },
+
+  insightLabel: { color: "#B9A8D8", fontSize: 10, fontWeight: "800", letterSpacing: 1.5 },
+
+  insightText: { color: "#D9DCE3", fontSize: 14, lineHeight: 21, marginTop: 8 },
+
+  screenEyebrow: { color: "#777D89", fontSize: 11, fontWeight: "700", letterSpacing: 2, marginBottom: 8 },
+
+  screenTitle: { color: "#FFFFFF", fontSize: 28, fontWeight: "600", lineHeight: 34, marginBottom: 8 },
+
+  screenSubtitle: { color: "#A7ACB8", fontSize: 15, lineHeight: 23, marginBottom: 28 },
+
+  talkContent: {
+    flexGrow: 1,
+    alignItems: "center",
+    paddingHorizontal: 22,
+    paddingTop: 28,
+    paddingBottom: 110,
+  },
+
+  emptyCard: {
+    backgroundColor: "#151A24",
+    borderRadius: 20,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: "#252C39",
+  },
+
+  emptyTitle: { color: "#FFFFFF", fontSize: 18, fontWeight: "600", marginBottom: 8 },
+
+  emptyText: { color: "#A7ACB8", fontSize: 14, lineHeight: 22 },
+
+  secondaryButton: {
+    alignSelf: "flex-start",
+    backgroundColor: "#252C39",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 22,
+    marginTop: 18,
+  },
+
+  secondaryButtonText: { color: "#FFFFFF", fontSize: 13, fontWeight: "600" },
+
+  settingsCard: {
+    backgroundColor: "#151A24",
+    borderRadius: 18,
+    padding: 18,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#252C39",
+  },
+
+  settingLabel: { color: "#777D89", fontSize: 10, fontWeight: "800", letterSpacing: 1.5 },
+
+  settingValue: { color: "#FFFFFF", fontSize: 15, marginTop: 8 },
+
+  tabBar: {
+    position: "absolute",
+    left: 12,
+    right: 12,
+    bottom: 10,
+    height: 72,
+    borderRadius: 24,
+    backgroundColor: "#151A24",
+    borderWidth: 1,
+    borderColor: "#252C39",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    paddingHorizontal: 4,
+  },
+
+  tab: { flex: 1, alignItems: "center", justifyContent: "center", gap: 5 },
+
+  tabMark: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: "#4C5360",
+  },
+
+  tabMarkActive: { width: 18, backgroundColor: "#E8A33D" },
+
+  tabLabel: { color: "#777D89", fontSize: 10 },
+
+  tabLabelActive: { color: "#FFFFFF", fontWeight: "600" },
 });
