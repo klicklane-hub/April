@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl =
@@ -26,13 +27,11 @@ const webStorage = {
 };
 
 const authStorage =
-  typeof window !== "undefined"
-    ? PlatformStorage()
-    : serverStorage;
-
-function PlatformStorage() {
-  return webStorage;
-}
+  Platform.OS === "web"
+    ? webStorage
+    : typeof window !== "undefined"
+      ? AsyncStorage
+      : serverStorage;
 
 export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
   auth: {
