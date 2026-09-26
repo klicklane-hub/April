@@ -44,6 +44,9 @@ export default function HomeScreen() {
   const [checkInSaving, setCheckInSaving] = useState(false);
   const [checkInComplete, setCheckInComplete] = useState(false);
   const [checkInMessage, setCheckInMessage] = useState("");
+  const [todayCheckIn, setTodayCheckIn] = useState<any>(null);
+  const [healthEntries, setHealthEntries] = useState<any[]>([]);
+  const [healthLoading, setHealthLoading] = useState(false);
 
   const pulse = useRef(new Animated.Value(1)).current;
   const latestTranscript = useRef("");
@@ -442,6 +445,34 @@ export default function HomeScreen() {
     );
   }
 
+  const loadHealthData = async () => {
+    if (!sessionUser) return;
+    setHealthLoading(true);
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    const { data: checkIn } = await supabase
+      .from("check_ins")
+      .select("id, overall_feeling, sleep_hours, energy_level, emotional_state, physical_concerns, checked_in_at")
+      .eq("user_id", sessionUser.id)
+      .gte("checked_in_at", start.toISOString())
+      .order("checked_in_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const { data: entries } = await supabase
+      .from("health_entries")
+      .select("id, category, title, content, severity, occurred_at, created_at")
+      .eq("user_id", sessionUser.id)
+      .order("occurred_at", { ascending: false })
+      .limit(30);
+    setTodayCheckIn(checkIn ?? null);
+    setHealthEntries(entries ?? []);
+    setHealthLoading(false);
+  };
+
+  useEffect(() => {
+    if (sessionUser && profileReady) loadHealthData();
+  }, [sessionUser?.id, profileReady]);
+
   const checkInQuestions = [
     { key: "overallFeeling", title: "How are you feeling overall?", placeholder: "Tell me in your own words…" },
     { key: "sleepHours", title: "How did you sleep?", placeholder: "For example: 7 hours" },
@@ -503,6 +534,7 @@ export default function HomeScreen() {
     }
     setCheckInComplete(true);
     setCheckInSaving(false);
+    await loadHealthData();
   };
 
   const nextCheckInStep = async () => {
@@ -596,12 +628,12 @@ export default function HomeScreen() {
         <View style={styles.snapshotCard}>
           <Text style={styles.snapshotIcon}>◷</Text>
           <Text style={styles.snapshotTitle}>Sleep</Text>
-          <Text style={styles.snapshotValue}>Not recorded</Text>
+          <Text style={styles.snapshotValue}>{todayCheckIn?.sleep_hours != null ? `${todayCheckIn.sleep_hours} hours` : "Not recorded"}</Text>
         </View>
         <View style={styles.snapshotCard}>
           <Text style={styles.snapshotIcon}>✦</Text>
           <Text style={styles.snapshotTitle}>Energy</Text>
-          <Text style={styles.snapshotValue}>Not recorded</Text>
+          <Text style={styles.snapshotValue}>{todayCheckIn?.energy_level != null ? `${todayCheckIn.energy_level}/10` : "Not recorded"}</Text>
         </View>
       </View>
 
@@ -675,15 +707,33 @@ export default function HomeScreen() {
       <Text style={styles.screenSubtitle}>
         Things you choose to record will appear here in chronological order.
       </Text>
-      <View style={styles.emptyCard}>
-        <Text style={styles.emptyTitle}>Nothing recorded yet.</Text>
-        <Text style={styles.emptyText}>
-          Start with a conversation. APRIL can turn what you tell her into useful health records you can review later.
-        </Text>
-        <Pressable style={styles.secondaryButton} onPress={() => setActiveTab("talk")}>
-          <Text style={styles.secondaryButtonText}>Start a conversation</Text>
-        </Pressable>
-      </View>
+      {healthLoading ? (
+        <View style={styles.emptyCard}><ActivityIndicator color="#E8A33D" /><Text style={styles.emptyText}>Loading your health story…</Text></View>
+      ) : healthEntries.length === 0 ? (
+        <View style={styles.emptyCard}>
+          <Text style={styles.emptyTitle}>Nothing recorded yet.</Text>
+          <Text style={styles.emptyText}>
+            Start with a daily check-in. APRIL will keep the information you choose to record in your timeline.
+          </Text>
+          <Pressable style={styles.secondaryButton} onPress={beginCheckIn}>
+            <Text style={styles.secondaryButtonText}>Start a check-in</Text>
+          </Pressable>
+        </View>
+      ) : (
+        <View style={styles.timeline}>
+          {healthEntries.map((entry) => (
+            <View key={entry.id} style={styles.timelineItem}>
+              <View style={styles.timelineDot} />
+              <View style={styles.timelineCard}>
+                <Text style={styles.timelineCategory}>{String(entry.category).toUpperCase()}</Text>
+                <Text style={styles.timelineTitle}>{entry.title}</Text>
+                <Text style={styles.timelineText}>{entry.content}</Text>
+                <Text style={styles.timelineDate}>{new Date(entry.occurred_at || entry.created_at).toLocaleString()}</Text>
+              </View>
+            </View>
+          ))}
+        </View>
+      )}
     </ScrollView>
   );
 
@@ -1217,6 +1267,14 @@ const styles = StyleSheet.create({
   summaryText: { color: "#FFFFFF", fontSize: 18, lineHeight: 26, marginBottom: 12 },
   summaryLine: { color: "#A7ACB8", fontSize: 14, lineHeight: 22, marginTop: 4 },
 
+  timeline: { marginTop: 8 },
+  timelineItem: { flexDirection: "row", marginBottom: 12 },
+  timelineDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#E8A33D", marginTop: 24, marginRight: 12 },
+  timelineCard: { flex: 1, backgroundColor: "#151A24", borderRadius: 18, padding: 16, borderWidth: 1, borderColor: "#252C39" },
+  timelineCategory: { color: "#E8A33D", fontSize: 9, fontWeight: "800", letterSpacing: 1.3, marginBottom: 6 },
+  timelineTitle: { color: "#FFFFFF", fontSize: 16, fontWeight: "600", marginBottom: 5 },
+  timelineText: { color: "#A7ACB8", fontSize: 14, lineHeight: 21 },
+  timelineDate: { color: "#777D89", fontSize: 11, marginTop: 10 },
   tabBar: {
     position: "absolute",
     left: 12,
