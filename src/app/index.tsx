@@ -26,7 +26,7 @@ export default function HomeScreen() {
   const [sessionUser, setSessionUser] = useState<any>(null);
   const [profileReady, setProfileReady] = useState(false);
   const [profileName, setProfileName] = useState("");
-  const [activeTab, setActiveTab] = useState<"home" | "talk" | "health" | "insights" | "me">("home");
+  const [activeTab, setActiveTab] = useState<"home" | "talk" | "health" | "insights" | "me" | "checkin">("home");
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
 
   const [authMode, setAuthMode] = useState<AuthMode>("signin");
@@ -39,6 +39,11 @@ export default function HomeScreen() {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [aprilResponse, setAprilResponse] = useState("");
+  const [checkInStep, setCheckInStep] = useState(0);
+  const [checkInAnswers, setCheckInAnswers] = useState({ overallFeeling: "", sleepHours: "", energyLevel: "", emotionalState: "", physicalConcerns: "" });
+  const [checkInSaving, setCheckInSaving] = useState(false);
+  const [checkInComplete, setCheckInComplete] = useState(false);
+  const [checkInMessage, setCheckInMessage] = useState("");
 
   const pulse = useRef(new Animated.Value(1)).current;
   const latestTranscript = useRef("");
@@ -437,6 +442,122 @@ export default function HomeScreen() {
     );
   }
 
+  const checkInQuestions = [
+    { key: "overallFeeling", title: "How are you feeling overall?", placeholder: "Tell me in your own words…" },
+    { key: "sleepHours", title: "How did you sleep?", placeholder: "For example: 7 hours" },
+    { key: "energyLevel", title: "How’s your energy?", placeholder: "For example: 6 out of 10" },
+    { key: "emotionalState", title: "How are you feeling emotionally?", placeholder: "For example: calm, stressed, happy…" },
+    { key: "physicalConcerns", title: "Anything bothering you physically?", placeholder: "Tell me anything you’ve noticed, or say none." },
+  ] as const;
+
+  const beginCheckIn = () => {
+    setCheckInStep(0);
+    setCheckInAnswers({ overallFeeling: "", sleepHours: "", energyLevel: "", emotionalState: "", physicalConcerns: "" });
+    setCheckInComplete(false);
+    setCheckInMessage("");
+    setActiveTab("checkin");
+  };
+
+  const updateCheckInAnswer = (value: string) => {
+    const key = checkInQuestions[checkInStep].key;
+    setCheckInAnswers((current) => ({ ...current, [key]: value }));
+  };
+
+  const saveCheckIn = async () => {
+    if (!sessionUser) return;
+    setCheckInSaving(true);
+    setCheckInMessage("");
+    const sleepMatch = checkInAnswers.sleepHours.match(/\d+(?:\.\d+)?/);
+    const energyMatch = checkInAnswers.energyLevel.match(/\d+(?:\.\d+)?/);
+    const sleepHours = sleepMatch ? Number(sleepMatch[0]) : null;
+    const energyLevel = energyMatch ? Number(energyMatch[0]) : null;
+
+    const { error } = await supabase.from("check_ins").insert({
+      user_id: sessionUser.id,
+      overall_feeling: checkInAnswers.overallFeeling.trim() || null,
+      sleep_hours: sleepHours !== null && sleepHours <= 24 ? sleepHours : null,
+      energy_level: energyLevel !== null && energyLevel <= 10 ? energyLevel : null,
+      emotional_state: checkInAnswers.emotionalState.trim() || null,
+      physical_concerns: checkInAnswers.physicalConcerns.trim() || null,
+    });
+
+    if (error) {
+      setCheckInMessage(error.message);
+      setCheckInSaving(false);
+      return;
+    }
+
+    const entries = [
+      checkInAnswers.overallFeeling.trim() ? { category: "note", title: "Overall feeling", content: checkInAnswers.overallFeeling.trim() } : null,
+      sleepHours !== null && sleepHours <= 24 ? { category: "sleep", title: "Sleep", content: String(sleepHours), metadata: { unit: "hours" } } : null,
+      energyLevel !== null && energyLevel <= 10 ? { category: "energy", title: "Energy", content: String(energyLevel), severity: energyLevel, metadata: { scale: "0-10" } } : null,
+      checkInAnswers.emotionalState.trim() ? { category: "mood", title: "Emotional state", content: checkInAnswers.emotionalState.trim() } : null,
+      checkInAnswers.physicalConcerns.trim() && checkInAnswers.physicalConcerns.trim().toLowerCase() !== "none" ? { category: "symptom", title: "Physical concern", content: checkInAnswers.physicalConcerns.trim() } : null,
+    ].filter(Boolean) as any[];
+
+    if (entries.length) {
+      const { error: entriesError } = await supabase.from("health_entries").insert(
+        entries.map((entry) => ({ ...entry, user_id: sessionUser.id, source: "check_in" }))
+      );
+      if (entriesError) console.log("APRIL health entry save error:", entriesError.message);
+    }
+    setCheckInComplete(true);
+    setCheckInSaving(false);
+  };
+
+  const nextCheckInStep = async () => {
+    const key = checkInQuestions[checkInStep].key;
+    if (!checkInAnswers[key].trim()) {
+      setCheckInMessage("Take your time — an answer helps me understand your day.");
+      return;
+    }
+    setCheckInMessage("");
+    if (checkInStep < checkInQuestions.length - 1) setCheckInStep((step) => step + 1);
+    else await saveCheckIn();
+  };
+
+  const renderCheckIn = () => {
+    if (checkInComplete) {
+      return (
+        <ScrollView contentContainerStyle={styles.checkInContent}>
+          <Text style={styles.screenEyebrow}>DAILY CHECK-IN</Text>
+          <Text style={styles.screenTitle}>Thank you for checking in.</Text>
+          <Text style={styles.screenSubtitle}>I’ve saved what you shared so you can come back to it later.</Text>
+          <View style={styles.checkInSummaryCard}>
+            <Text style={styles.summaryLabel}>TODAY’S CHECK-IN</Text>
+            <Text style={styles.summaryText}>{checkInAnswers.overallFeeling}</Text>
+            {checkInAnswers.sleepHours ? <Text style={styles.summaryLine}>Sleep · {checkInAnswers.sleepHours}</Text> : null}
+            {checkInAnswers.energyLevel ? <Text style={styles.summaryLine}>Energy · {checkInAnswers.energyLevel}</Text> : null}
+            {checkInAnswers.emotionalState ? <Text style={styles.summaryLine}>Emotion · {checkInAnswers.emotionalState}</Text> : null}
+            {checkInAnswers.physicalConcerns ? <Text style={styles.summaryLine}>Physical · {checkInAnswers.physicalConcerns}</Text> : null}
+          </View>
+          <Pressable style={styles.button} onPress={() => setActiveTab("home")}><Text style={styles.buttonText}>Back to today</Text></Pressable>
+        </ScrollView>
+      );
+    }
+    const question = checkInQuestions[checkInStep];
+    const value = checkInAnswers[question.key];
+    return (
+      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+        <ScrollView contentContainerStyle={styles.checkInContent} keyboardShouldPersistTaps="handled">
+          <Text style={styles.screenEyebrow}>DAILY CHECK-IN</Text>
+          <View style={styles.progressRow}>{checkInQuestions.map((_, index) => <View key={index} style={[styles.progressDot, index <= checkInStep && styles.progressDotActive]} />)}</View>
+          <Text style={styles.checkInStepText}>{checkInStep + 1} of {checkInQuestions.length}</Text>
+          <Text style={styles.checkInQuestion}>{question.title}</Text>
+          <Text style={styles.checkInPrompt}>There’s no perfect answer. Just tell me what feels true right now.</Text>
+          <TextInput style={styles.checkInInput} placeholder={question.placeholder} placeholderTextColor="#777D89" value={value} onChangeText={updateCheckInAnswer} multiline={question.key !== "sleepHours" && question.key !== "energyLevel"} keyboardType={question.key === "sleepHours" || question.key === "energyLevel" ? "decimal-pad" : "default"} />
+          {checkInMessage ? <Text style={styles.checkInMessage}>{checkInMessage}</Text> : null}
+          <View style={styles.checkInActions}>
+            {checkInStep > 0 ? <Pressable style={styles.backButton} onPress={() => { setCheckInMessage(""); setCheckInStep((step) => step - 1); }}><Text style={styles.backButtonText}>Back</Text></Pressable> : null}
+            <Pressable style={[styles.button, checkInSaving && styles.buttonDisabled]} onPress={nextCheckInStep} disabled={checkInSaving}>
+              {checkInSaving ? <ActivityIndicator color="#0B0E14" /> : <Text style={styles.buttonText}>{checkInStep === checkInQuestions.length - 1 ? "Save check-in" : "Continue"}</Text>}
+            </Pressable>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    );
+  };
+
   const renderHome = () => (
     <ScrollView contentContainerStyle={styles.dashboardContent}>
       <View style={styles.dashboardHeader}>
@@ -484,7 +605,7 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      <Pressable style={styles.checkInCard} onPress={() => setActiveTab("talk")}>
+      <Pressable style={styles.checkInCard} onPress={beginCheckIn}>
         <View>
           <Text style={styles.checkInLabel}>DAILY CHECK-IN</Text>
           <Text style={styles.checkInTitle}>Take a moment for yourself.</Text>
@@ -614,6 +735,7 @@ export default function HomeScreen() {
   const renderActiveScreen = () => {
     if (activeTab === "home") return renderHome();
     if (activeTab === "talk") return renderTalk();
+    if (activeTab === "checkin") return renderCheckIn();
     if (activeTab === "health") return renderHealth();
     if (activeTab === "insights") return renderInsights();
     return renderMe();
@@ -631,86 +753,12 @@ export default function HomeScreen() {
             ["insights", "Insights"],
             ["me", "Me"],
           ].map(([key, label]) => (
-            <Pressable
-              key={key}
-              style={styles.tab}
-              onPress={() => setActiveTab(key as typeof activeTab)}
-            >
+            <Pressable key={key} style={styles.tab} onPress={() => setActiveTab(key as typeof activeTab)}>
               <View style={[styles.tabMark, activeTab === key && styles.tabMarkActive]} />
-              <Text style={[styles.tabLabel, activeTab === key && styles.tabLabelActive]}>
-                {label}
-              </Text>
+              <Text style={[styles.tabLabel, activeTab === key && styles.tabLabelActive]}>{label}</Text>
             </Pressable>
           ))}
         </View>
-      </View>
-    </SafeAreaView>
-  );
-        <Text style={styles.logo}>APRIL</Text>
-
-        <Animated.View
-          style={[
-            styles.companionGlow,
-            { transform: [{ scale: pulse }] },
-          ]}
-        >
-          <View style={styles.companion}>
-            <View style={styles.eyes}>
-              <View style={styles.eye} />
-              <View style={styles.eye} />
-            </View>
-
-            <View
-              style={[
-                styles.mouth,
-                isListening && styles.listeningMouth,
-              ]}
-            />
-          </View>
-        </Animated.View>
-
-        <Text style={styles.title}>
-          {isListening ? "I’m listening." : "How are you feeling today?"}
-        </Text>
-
-        <Text style={styles.subtitle}>
-          {isListening
-            ? "Take your time. I’m here."
-            : "Your personal health & wellbeing companion."}
-        </Text>
-
-        {transcript.length > 0 && (
-          <View style={styles.transcriptBox}>
-            <Text style={styles.transcriptLabel}>I heard:</Text>
-            <Text style={styles.transcript}>{transcript}</Text>
-          </View>
-        )}
-
-        {aprilResponse.length > 0 && (
-          <View style={styles.responseBox}>
-            <Text style={styles.responseLabel}>APRIL</Text>
-            <Text style={styles.response}>{aprilResponse}</Text>
-          </View>
-        )}
-
-        <Pressable
-          style={({ pressed }) => [
-            styles.button,
-            pressed && styles.buttonPressed,
-          ]}
-          onPress={handleTalk}
-        >
-          <Text style={styles.buttonText}>
-            {isListening ? "I’m done" : "Talk to me"}
-          </Text>
-        </Pressable>
-
-        <Pressable
-          style={styles.signOutButton}
-          onPress={() => supabase.auth.signOut()}
-        >
-          <Text style={styles.signOutText}>Sign out</Text>
-        </Pressable>
       </View>
     </SafeAreaView>
   );
@@ -1151,6 +1199,23 @@ const styles = StyleSheet.create({
   settingLabel: { color: "#777D89", fontSize: 10, fontWeight: "800", letterSpacing: 1.5 },
 
   settingValue: { color: "#FFFFFF", fontSize: 15, marginTop: 8 },
+
+  checkInContent: { flexGrow: 1, paddingHorizontal: 22, paddingTop: 28, paddingBottom: 110 },
+  progressRow: { flexDirection: "row", gap: 6, marginTop: 8, marginBottom: 8 },
+  progressDot: { width: 28, height: 4, borderRadius: 2, backgroundColor: "#252C39" },
+  progressDotActive: { backgroundColor: "#E8A33D" },
+  checkInStepText: { color: "#777D89", fontSize: 12, marginBottom: 18 },
+  checkInQuestion: { color: "#FFFFFF", fontSize: 30, fontWeight: "600", lineHeight: 37, marginBottom: 10 },
+  checkInPrompt: { color: "#A7ACB8", fontSize: 15, lineHeight: 23, marginBottom: 24 },
+  checkInInput: { minHeight: 130, backgroundColor: "#151A24", borderWidth: 1, borderColor: "#252C39", borderRadius: 20, color: "#FFFFFF", fontSize: 17, lineHeight: 25, paddingHorizontal: 18, paddingVertical: 17, textAlignVertical: "top" },
+  checkInMessage: { color: "#E8A33D", fontSize: 13, lineHeight: 19, marginTop: 12 },
+  checkInActions: { flexDirection: "row", alignItems: "center", justifyContent: "flex-end", gap: 12, marginTop: 22 },
+  backButton: { paddingVertical: 15, paddingHorizontal: 16 },
+  backButtonText: { color: "#A7ACB8", fontSize: 15, fontWeight: "600" },
+  checkInSummaryCard: { backgroundColor: "#151A24", borderRadius: 20, padding: 20, borderWidth: 1, borderColor: "#252C39", marginBottom: 22 },
+  summaryLabel: { color: "#E8A33D", fontSize: 10, fontWeight: "800", letterSpacing: 1.5, marginBottom: 10 },
+  summaryText: { color: "#FFFFFF", fontSize: 18, lineHeight: 26, marginBottom: 12 },
+  summaryLine: { color: "#A7ACB8", fontSize: 14, lineHeight: 22, marginTop: 4 },
 
   tabBar: {
     position: "absolute",
