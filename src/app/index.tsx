@@ -558,6 +558,29 @@ export default function HomeScreen() {
     await loadHealthData();
   };
 
+  const speakCheckInQuestion = (questionText: string, onDone?: () => void) => {
+    if (Platform.OS !== "web" || typeof window === "undefined" || !("speechSynthesis" in window)) {
+      setCheckInMessage("Voice questions are available in the web voice experience. You can still answer by voice or type here.");
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(questionText);
+    utterance.rate = 0.92;
+    utterance.pitch = 1.02;
+    utterance.volume = 1;
+    utterance.onend = () => onDone?.();
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const startConversationalCheckIn = () => {
+    setCheckInMessage("APRIL is asking…");
+    const question = checkInQuestions[checkInStepRef.current];
+    speakCheckInQuestion(question.title, () => {
+      startCheckInVoice();
+    });
+  };
+
   const startCheckInVoice = async () => {
     const permission = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
     if (!permission.granted) {
@@ -615,6 +638,13 @@ export default function HomeScreen() {
           <Text style={styles.checkInStepText}>{checkInStep + 1} of {checkInQuestions.length}</Text>
           <Text style={styles.checkInQuestion}>{question.title}</Text>
           <Text style={styles.checkInPrompt}>There’s no perfect answer. Just tell me what feels true right now.</Text>
+          <Pressable
+            style={styles.conversationButton}
+            onPress={startConversationalCheckIn}
+            disabled={isListening || checkInSaving}
+          >
+            <Text style={styles.conversationButtonText}>Talk through this check-in</Text>
+          </Pressable>
           <Pressable
             style={[styles.voiceAnswerButton, isListening && styles.voiceAnswerButtonActive]}
             onPress={startCheckInVoice}
@@ -1296,6 +1326,8 @@ const styles = StyleSheet.create({
 
   settingValue: { color: "#FFFFFF", fontSize: 15, marginTop: 8 },
 
+  conversationButton: { marginTop: 18, minHeight: 56, borderRadius: 18, backgroundColor: "#E8A33D", alignItems: "center", justifyContent: "center" },
+  conversationButtonText: { color: "#0B0E14", fontSize: 16, fontWeight: "700" },
   voiceAnswerButton: { marginTop: 14, minHeight: 52, borderRadius: 16, borderWidth: 1, borderColor: "#343C4B", backgroundColor: "#111620", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 9 },
   voiceAnswerButtonActive: { borderColor: "#E8A33D", backgroundColor: "#171A20" },
   voiceAnswerIcon: { color: "#E8A33D", fontSize: 14 },
