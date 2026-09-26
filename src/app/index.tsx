@@ -147,7 +147,7 @@ export default function HomeScreen() {
     setTranscript(text);
   });
 
-  useSpeechRecognitionEvent("end", () => {
+  useSpeechRecognitionEvent("end", async () => {
     setIsListening(false);
     const spoken = latestTranscript.current.trim();
 
