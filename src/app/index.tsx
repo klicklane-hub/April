@@ -195,6 +195,7 @@ export default function HomeScreen() {
   });
 
   useSpeechRecognitionEvent("result", (event) => {
+    if (suppressSpeechEnd.current) return;
     const text = event.results?.[0]?.transcript ?? "";
     latestTranscript.current = text;
     setTranscript(text);
