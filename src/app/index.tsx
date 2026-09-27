@@ -744,6 +744,24 @@ export default function HomeScreen() {
 
   const reviewTodayCheckIn = () => {
     if (!todayCheckIn) return;
+    if (Platform.OS === "web" && typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+    if (isListening) {
+      suppressSpeechEnd.current = true;
+      ExpoSpeechRecognitionModule.stop();
+    }
+    checkInFlowActive.current = false;
+    checkInVoiceActive.current = false;
+    talkFlowActive.current = false;
+    latestTranscript.current = "";
+    setIsListening(false);
+    setTalkStatus("idle");
+    setTranscript("");
+    setTalkError(false);
+    setAprilResponse("");
+    setCheckInVoiceError(false);
+    setCheckInMessage("");
     setCheckInAnswers({
       overallFeeling: todayCheckIn.overall_feeling ?? "",
       sleepHours: todayCheckIn.sleep_hours != null ? String(todayCheckIn.sleep_hours) : "",
