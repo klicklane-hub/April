@@ -62,6 +62,7 @@ export default function HomeScreen() {
   const latestTranscript = useRef("");
   const talkContext = useRef<{ role: string; content: string }[]>([]);
   const checkInVoiceActive = useRef(false);
+  const checkInFlowActive = useRef(false);
   const suppressSpeechEnd = useRef(false);
   const checkInStepRef = useRef(0);
 
@@ -253,6 +254,10 @@ export default function HomeScreen() {
           ]);
           setCheckInMessage(reply);
           speakAprilResponse(reply);
+
+          if (!checkInFlowActive.current) {
+            return;
+          }
 
           const currentStep = checkInStepRef.current;
           if (currentStep < checkInQuestions.length - 1) {
@@ -514,6 +519,7 @@ export default function HomeScreen() {
       suppressSpeechEnd.current = true;
       ExpoSpeechRecognitionModule.stop();
     }
+    checkInFlowActive.current = false;
     checkInVoiceActive.current = false;
     setIsListening(false);
     if (tab !== "talk") {
@@ -711,6 +717,7 @@ export default function HomeScreen() {
       suppressSpeechEnd.current = true;
       ExpoSpeechRecognitionModule.stop();
     }
+    checkInFlowActive.current = true;
     checkInVoiceActive.current = false;
     latestTranscript.current = "";
     setIsListening(false);
@@ -835,6 +842,7 @@ export default function HomeScreen() {
       setCheckInMessage("Microphone access is needed to answer by voice. You can allow it in your browser or device settings, or type your answer below.");
       return;
     }
+    checkInFlowActive.current = true;
     checkInVoiceActive.current = true;
     latestTranscript.current = "";
     setTranscript("");
