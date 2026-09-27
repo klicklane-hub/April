@@ -999,12 +999,26 @@ export default function HomeScreen() {
       </Text>
       {!healthLoading && healthEntries.length > 0 ? (
         <>
-          <Text style={styles.timelineUpdated}>
-            Last recorded · {new Date(healthEntries[0].occurred_at || healthEntries[0].created_at).toLocaleString(undefined, { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" })}
-          </Text>
-          <Text style={styles.timelineCoverage}>
-            Showing your 30 most recent recorded entries.
-          </Text>
+          {(() => {
+            const filteredForTimestamp = healthFilter === "all"
+              ? healthEntries
+              : healthEntries.filter((entry) => String(entry.category).toLowerCase() === healthFilter);
+            const latestForFilter = filteredForTimestamp[0];
+            const filterLabel = healthFilter === "all" ? "overall" :
+              healthFilter === "sleep" ? "sleep" :
+              healthFilter === "energy" ? "energy" :
+              healthFilter === "mood" ? "emotional" : "physical";
+            return (
+              <>
+                <Text style={styles.timelineUpdated}>
+                  Last {filterLabel} recorded · {new Date(latestForFilter?.occurred_at || latestForFilter?.created_at || healthEntries[0]?.occurred_at || healthEntries[0]?.created_at).toLocaleString(undefined, { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" })}
+                </Text>
+                <Text style={styles.timelineCoverage}>
+                  Showing your 30 most recent recorded entries.
+                </Text>
+              </>
+            );
+          })()}
         </>
       ) : null}
       {healthLoading ? (
