@@ -40,6 +40,7 @@ export default function HomeScreen() {
   const [transcript, setTranscript] = useState("");
   const [aprilResponse, setAprilResponse] = useState("");
   const [talkStatus, setTalkStatus] = useState<"idle" | "listening" | "thinking" | "speaking">("idle");
+  const [talkError, setTalkError] = useState(false);
   const [checkInStep, setCheckInStep] = useState(0);
   const [checkInAnswers, setCheckInAnswers] = useState({ overallFeeling: "", sleepHours: "", energyLevel: "", emotionalState: "", physicalConcerns: "" });
   const [checkInSaving, setCheckInSaving] = useState(false);
@@ -263,6 +264,7 @@ export default function HomeScreen() {
       setCheckInMessage("I couldn’t hear that clearly. You can try again or type your answer.");
     } else {
       setTalkStatus("idle");
+      setTalkError(true);
       setAprilResponse("I couldn’t hear that clearly. Please try again.");
     }
   });
@@ -407,6 +409,7 @@ export default function HomeScreen() {
 
     setTranscript("");
     setAprilResponse("");
+    setTalkError(false);
     latestTranscript.current = "";
 
     try {
@@ -419,8 +422,18 @@ export default function HomeScreen() {
       console.log("APRIL microphone start error:", error?.message || String(error));
       setIsListening(false);
       setTalkStatus("idle");
+      setTalkError(true);
       setAprilResponse("I couldn’t start the microphone. Please try again.");
     }
+  };
+
+  const retryListening = () => {
+    setTalkError(false);
+    setAprilResponse("");
+    setTranscript("");
+    latestTranscript.current = "";
+    setTalkStatus("listening");
+    startListening();
   };
 
   const stopListening = () => {
@@ -445,6 +458,7 @@ export default function HomeScreen() {
       ExpoSpeechRecognitionModule.stop();
     }
     checkInVoiceActive.current = false;
+    setTalkError(false);
     talkContext.current = [];
     latestTranscript.current = "";
     setIsListening(false);
@@ -464,6 +478,7 @@ export default function HomeScreen() {
     setIsListening(false);
     if (tab !== "talk") {
       talkContext.current = [];
+      setTalkError(false);
       setTranscript("");
       setAprilResponse("");
       setTalkStatus("idle");
@@ -997,6 +1012,11 @@ export default function HomeScreen() {
       >
         <Text style={styles.buttonText}>{isListening ? "I’m done" : "Talk to me"}</Text>
       </Pressable>
+      {talkError && !isListening ? (
+        <Pressable style={styles.newConversationButton} onPress={retryListening}>
+          <Text style={styles.newConversationText}>Try again</Text>
+        </Pressable>
+      ) : null}
       {(transcript.length > 0 || aprilResponse.length > 0) && !isListening ? (
         <Pressable style={styles.newConversationButton} onPress={resetTalkConversation}>
           <Text style={styles.newConversationText}>Start a new conversation</Text>
