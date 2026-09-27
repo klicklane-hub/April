@@ -396,6 +396,18 @@ export default function HomeScreen() {
     }
   };
 
+  const handleTabChange = (tab: typeof activeTab) => {
+    if (Platform.OS === "web" && typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+    if (isListening) {
+      ExpoSpeechRecognitionModule.stop();
+    }
+    checkInVoiceActive.current = false;
+    setIsListening(false);
+    setActiveTab(tab);
+  };
+
   if (!sessionReady || (sessionUser && !profileReady)) {
     return (
       <SafeAreaView style={styles.container}>
@@ -701,7 +713,7 @@ export default function HomeScreen() {
             {checkInAnswers.emotionalState ? <Text style={styles.summaryLine}>Emotion · {checkInAnswers.emotionalState}</Text> : null}
             {checkInAnswers.physicalConcerns ? <Text style={styles.summaryLine}>Physical · {checkInAnswers.physicalConcerns}</Text> : null}
           </View>
-          <Pressable style={styles.button} onPress={() => setActiveTab("home")}><Text style={styles.buttonText}>Back to today</Text></Pressable>
+          <Pressable style={styles.button} onPress={() => handleTabChange("home")}><Text style={styles.buttonText}>Back to today</Text></Pressable>
         </ScrollView>
       );
     }
@@ -758,7 +770,7 @@ export default function HomeScreen() {
         You don’t have to fill anything out. Just talk to APRIL.
       </Text>
 
-      <Pressable style={styles.talkCard} onPress={() => setActiveTab("talk")}>
+      <Pressable style={styles.talkCard} onPress={() => handleTabChange("talk")}>
         <View style={styles.smallCompanion}>
           <View style={styles.smallEyeRow}>
             <View style={styles.smallEye} />
@@ -1047,7 +1059,7 @@ export default function HomeScreen() {
             ["insights", "Insights"],
             ["me", "Me"],
           ].map(([key, label]) => (
-            <Pressable key={key} style={styles.tab} onPress={() => setActiveTab(key as typeof activeTab)}>
+            <Pressable key={key} style={styles.tab} onPress={() => handleTabChange(key as typeof activeTab)}>
               <View style={[styles.tabMark, activeTab === key && styles.tabMarkActive]} />
               <Text style={[styles.tabLabel, activeTab === key && styles.tabLabelActive]}>{label}</Text>
             </Pressable>
