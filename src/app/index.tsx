@@ -709,7 +709,8 @@ export default function HomeScreen() {
     });
 
     if (error) {
-      setCheckInMessage(error.message);
+      console.log("APRIL check-in save error:", error.message);
+      setCheckInMessage("I couldn’t save your check-in just now. Your answers are still on this screen, so you can try saving again.");
       setCheckInSaving(false);
       return;
     }
