@@ -510,6 +510,7 @@ export default function HomeScreen() {
       window.speechSynthesis.cancel();
     }
     if (isListening) {
+      suppressSpeechEnd.current = true;
       ExpoSpeechRecognitionModule.stop();
     }
     checkInVoiceActive.current = false;
