@@ -46,6 +46,7 @@ export default function HomeScreen() {
   const [checkInSaving, setCheckInSaving] = useState(false);
   const [checkInComplete, setCheckInComplete] = useState(false);
   const [checkInMessage, setCheckInMessage] = useState("");
+  const [checkInSaveFailed, setCheckInSaveFailed] = useState(false);
   const [todayCheckIn, setTodayCheckIn] = useState<any>(null);
   const [healthEntries, setHealthEntries] = useState<any[]>([]);
   const [healthLoading, setHealthLoading] = useState(false);
@@ -694,6 +695,7 @@ export default function HomeScreen() {
     if (!sessionUser) return;
     setCheckInSaving(true);
     setCheckInMessage("");
+    setCheckInSaveFailed(false);
     const sleepMatch = checkInAnswers.sleepHours.match(/\d+(?:\.\d+)?/);
     const energyMatch = checkInAnswers.energyLevel.match(/\d+(?:\.\d+)?/);
     const sleepHours = sleepMatch ? Number(sleepMatch[0]) : null;
@@ -711,6 +713,7 @@ export default function HomeScreen() {
     if (error) {
       console.log("APRIL check-in save error:", error.message);
       setCheckInMessage("I couldn’t save your check-in just now. Your answers are still on this screen, so you can try saving again.");
+      setCheckInSaveFailed(true);
       setCheckInSaving(false);
       return;
     }
@@ -826,6 +829,11 @@ export default function HomeScreen() {
           <Text style={styles.screenSubtitle}>I’ve saved what you shared so you can come back to it later.</Text>
           {todayCheckIn?.checked_in_at ? <Text style={styles.checkInRecorded}>Recorded · {new Date(todayCheckIn.checked_in_at).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</Text> : null}
           {checkInMessage ? <Text style={styles.checkInMessage}>{checkInMessage}</Text> : null}
+          {checkInSaveFailed ? (
+            <Pressable style={styles.secondaryButton} onPress={saveCheckIn} disabled={checkInSaving}>
+              <Text style={styles.secondaryButtonText}>{checkInSaving ? "Saving…" : "Try saving again"}</Text>
+            </Pressable>
+          ) : null}
           <View style={styles.checkInSummaryCard}>
             <Text style={styles.summaryLabel}>TODAY’S CHECK-IN</Text>
             {checkInAnswers.overallFeeling ? <Text style={styles.summaryText}>{checkInAnswers.overallFeeling}</Text> : null}
