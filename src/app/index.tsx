@@ -63,6 +63,7 @@ export default function HomeScreen() {
   const talkContext = useRef<{ role: string; content: string }[]>([]);
   const checkInVoiceActive = useRef(false);
   const checkInFlowActive = useRef(false);
+  const talkFlowActive = useRef(false);
   const suppressSpeechEnd = useRef(false);
   const checkInStepRef = useRef(0);
 
@@ -288,6 +289,7 @@ export default function HomeScreen() {
       setAprilResponse("Thinking…");
       const context = talkContext.current.slice(-6);
       askApril(spoken, context).then((reply) => {
+        if (!talkFlowActive.current) return;
         talkContext.current = [
           ...talkContext.current,
           { role: "user", content: spoken },
@@ -439,10 +441,12 @@ export default function HomeScreen() {
   };
 
   const startListening = async () => {
+    talkFlowActive.current = true;
     const permission =
       await ExpoSpeechRecognitionModule.requestPermissionsAsync();
 
     if (!permission.granted) {
+      talkFlowActive.current = false;
       setTalkStatus("idle");
       Alert.alert(
         "Microphone permission needed",
@@ -464,6 +468,7 @@ export default function HomeScreen() {
       });
     } catch (error: any) {
       console.log("APRIL microphone start error:", error?.message || String(error));
+      talkFlowActive.current = false;
       setIsListening(false);
       setTalkStatus("idle");
       setTalkError(true);
@@ -503,6 +508,7 @@ export default function HomeScreen() {
       ExpoSpeechRecognitionModule.stop();
     }
     checkInVoiceActive.current = false;
+    talkFlowActive.current = false;
     setTalkError(false);
     talkContext.current = [];
     latestTranscript.current = "";
@@ -522,6 +528,7 @@ export default function HomeScreen() {
     }
     checkInFlowActive.current = false;
     checkInVoiceActive.current = false;
+    talkFlowActive.current = false;
     setIsListening(false);
     if (tab !== "talk") {
       talkContext.current = [];
