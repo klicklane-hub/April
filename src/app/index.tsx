@@ -62,6 +62,7 @@ export default function HomeScreen() {
   const latestTranscript = useRef("");
   const talkContext = useRef<{ role: string; content: string }[]>([]);
   const checkInVoiceActive = useRef(false);
+  const suppressSpeechEnd = useRef(false);
   const checkInStepRef = useRef(0);
 
   useEffect(() => {
@@ -216,6 +217,11 @@ export default function HomeScreen() {
 
   useSpeechRecognitionEvent("end", async () => {
     setIsListening(false);
+    if (suppressSpeechEnd.current) {
+      suppressSpeechEnd.current = false;
+      setTalkStatus("idle");
+      return;
+    }
     if (!checkInVoiceActive.current) setTalkStatus("thinking");
     const spoken = latestTranscript.current.trim();
 
@@ -486,6 +492,7 @@ export default function HomeScreen() {
       window.speechSynthesis.cancel();
     }
     if (isListening) {
+      suppressSpeechEnd.current = true;
       ExpoSpeechRecognitionModule.stop();
     }
     checkInVoiceActive.current = false;
