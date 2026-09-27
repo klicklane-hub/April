@@ -431,6 +431,21 @@ export default function HomeScreen() {
     }
   };
 
+  const resetTalkConversation = () => {
+    if (Platform.OS === "web" && typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+    if (isListening) {
+      ExpoSpeechRecognitionModule.stop();
+    }
+    talkContext.current = [];
+    latestTranscript.current = "";
+    setIsListening(false);
+    setTranscript("");
+    setAprilResponse("");
+    setTalkStatus("idle");
+  };
+
   const handleTabChange = (tab: typeof activeTab) => {
     if (Platform.OS === "web" && typeof window !== "undefined" && "speechSynthesis" in window) {
       window.speechSynthesis.cancel();
@@ -938,6 +953,11 @@ export default function HomeScreen() {
       >
         <Text style={styles.buttonText}>{isListening ? "I’m done" : "Talk to me"}</Text>
       </Pressable>
+      {(transcript.length > 0 || aprilResponse.length > 0) && !isListening ? (
+        <Pressable style={styles.newConversationButton} onPress={resetTalkConversation}>
+          <Text style={styles.newConversationText}>Start a new conversation</Text>
+        </Pressable>
+      ) : null}
     </ScrollView>
   );
 
@@ -1752,6 +1772,8 @@ const styles = StyleSheet.create({
   },
   settingHint: { color: "#777D89", fontSize: 13, lineHeight: 19, marginTop: 7 },
 
+  newConversationButton: { marginTop: 12, paddingVertical: 12, paddingHorizontal: 16, alignItems: "center" },
+  newConversationText: { color: "#A7ACB8", fontSize: 13, fontWeight: "600" },
   conversationButton: { marginTop: 18, minHeight: 56, borderRadius: 18, backgroundColor: "#E8A33D", alignItems: "center", justifyContent: "center" },
   conversationButtonText: { color: "#0B0E14", fontSize: 16, fontWeight: "700" },
   voiceAnswerButton: { marginTop: 14, minHeight: 52, borderRadius: 16, borderWidth: 1, borderColor: "#343C4B", backgroundColor: "#111620", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 9 },
