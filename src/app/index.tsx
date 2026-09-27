@@ -1034,7 +1034,9 @@ export default function HomeScreen() {
                 style={[styles.filterChip, healthFilter === key && styles.filterChipActive]}
                 onPress={() => setHealthFilter(key)}
               >
-                <Text style={[styles.filterChipText, healthFilter === key && styles.filterChipTextActive]}>{label}</Text>
+                <Text style={[styles.filterChipText, healthFilter === key && styles.filterChipTextActive]}>
+                  {label} · {key === "all" ? healthEntries.length : healthEntries.filter((entry) => String(entry.category).toLowerCase() === key).length}
+                </Text>
               </Pressable>
             ))}
           </ScrollView>
