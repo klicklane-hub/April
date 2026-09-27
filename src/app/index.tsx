@@ -1207,14 +1207,19 @@ export default function HomeScreen() {
               </View>
             ) : null}
 
-            {(energyChangeNote || sleepChangeNote) && (
+            {recordedDays.length >= 4 ? (
               <View style={styles.insightCard}>
                 <Text style={styles.insightLabel}>RECENT CHANGE</Text>
                 {energyChangeNote && <Text style={styles.insightText}>{energyChangeNote}</Text>}
                 {sleepChangeNote && <Text style={[styles.insightText, energyChangeNote ? { marginTop: 8 } : null]}>{sleepChangeNote}</Text>}
+                {!energyChangeNote && !sleepChangeNote ? (
+                  <Text style={styles.insightText}>
+                    APRIL does not see a clear difference of 0.5 or more in your recorded sleep or energy between these periods.
+                  </Text>
+                ) : null}
                 <Text style={styles.insightHint}>This compares your three most recent recorded days with earlier recorded days.</Text>
               </View>
-            )}
+            ) : null}
 
             <View style={styles.insightCard}>
               <Text style={styles.insightLabel}>ABOUT THESE INSIGHTS</Text>
