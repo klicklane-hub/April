@@ -794,6 +794,7 @@ export default function HomeScreen() {
           <Text style={styles.screenEyebrow}>DAILY CHECK-IN</Text>
           <Text style={styles.screenTitle}>Thank you for checking in.</Text>
           <Text style={styles.screenSubtitle}>I’ve saved what you shared so you can come back to it later.</Text>
+          {todayCheckIn?.checked_in_at ? <Text style={styles.checkInRecorded}>Recorded · {new Date(todayCheckIn.checked_in_at).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</Text> : null}
           <View style={styles.checkInSummaryCard}>
             <Text style={styles.summaryLabel}>TODAY’S CHECK-IN</Text>
             {checkInAnswers.overallFeeling ? <Text style={styles.summaryText}>{checkInAnswers.overallFeeling}</Text> : null}
@@ -1818,6 +1819,7 @@ const styles = StyleSheet.create({
   checkInActions: { flexDirection: "row", alignItems: "center", justifyContent: "flex-end", gap: 12, marginTop: 22 },
   backButton: { paddingVertical: 15, paddingHorizontal: 16 },
   backButtonText: { color: "#A7ACB8", fontSize: 15, fontWeight: "600" },
+  checkInRecorded: { color: "#777D89", fontSize: 12, marginTop: -14, marginBottom: 18 },
   checkInSummaryCard: { backgroundColor: "#151A24", borderRadius: 20, padding: 20, borderWidth: 1, borderColor: "#252C39", marginBottom: 22 },
   summaryLabel: { color: "#E8A33D", fontSize: 10, fontWeight: "800", letterSpacing: 1.5, marginBottom: 10 },
   summaryText: { color: "#FFFFFF", fontSize: 18, lineHeight: 26, marginBottom: 12 },
