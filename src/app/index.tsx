@@ -716,13 +716,14 @@ export default function HomeScreen() {
           <Text style={styles.screenSubtitle}>I’ve saved what you shared so you can come back to it later.</Text>
           <View style={styles.checkInSummaryCard}>
             <Text style={styles.summaryLabel}>TODAY’S CHECK-IN</Text>
-            <Text style={styles.summaryText}>{checkInAnswers.overallFeeling}</Text>
-            {checkInAnswers.sleepHours ? <Text style={styles.summaryLine}>Sleep · {checkInAnswers.sleepHours}</Text> : null}
-            {checkInAnswers.energyLevel ? <Text style={styles.summaryLine}>Energy · {checkInAnswers.energyLevel}</Text> : null}
+            {checkInAnswers.overallFeeling ? <Text style={styles.summaryText}>{checkInAnswers.overallFeeling}</Text> : null}
+            {checkInAnswers.sleepHours ? <Text style={styles.summaryLine}>Sleep · {checkInAnswers.sleepHours} hours</Text> : null}
+            {checkInAnswers.energyLevel ? <Text style={styles.summaryLine}>Energy · {checkInAnswers.energyLevel}/10</Text> : null}
             {checkInAnswers.emotionalState ? <Text style={styles.summaryLine}>Emotion · {checkInAnswers.emotionalState}</Text> : null}
             {checkInAnswers.physicalConcerns ? <Text style={styles.summaryLine}>Physical · {checkInAnswers.physicalConcerns}</Text> : null}
           </View>
           <Pressable style={styles.button} onPress={() => handleTabChange("home")}><Text style={styles.buttonText}>Back to today</Text></Pressable>
+          <Pressable style={styles.secondaryButton} onPress={() => handleTabChange("health")}><Text style={styles.secondaryButtonText}>View my health story</Text></Pressable>
         </ScrollView>
       );
     }
