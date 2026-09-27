@@ -1246,6 +1246,9 @@ export default function HomeScreen() {
             Based on {recordedDays.length} recorded {recordedDays.length === 1 ? "day" : "days"} in your recent history.
             {latestRecordedLabel ? ` Last recorded ${latestRecordedLabel}.` : ""}
           </Text>
+          <Text style={styles.timelineCoverage}>
+            Insights use the 30 most recent recorded entries available to APRIL.
+          </Text>
         ) : null}
 
         {!hasEnoughHistory ? (
