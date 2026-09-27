@@ -1141,6 +1141,12 @@ export default function HomeScreen() {
     const averageEnergy = average(energyValues);
     const latestMood = healthEntries.find((entry) => entry.category === "mood");
     const hasEnoughHistory = recordedDays.length >= 2;
+    const hasSleepData = sleepValues.length > 0;
+    const hasEnergyData = energyValues.length > 0;
+    const missingBaselineAreas = [
+      !hasSleepData ? "sleep" : null,
+      !hasEnergyData ? "energy" : null,
+    ].filter(Boolean) as string[];
 
     return (
       <ScrollView contentContainerStyle={styles.dashboardContent}>
@@ -1171,14 +1177,26 @@ export default function HomeScreen() {
               <View style={styles.snapshotCard}>
                 <Text style={styles.snapshotIcon}>◷</Text>
                 <Text style={styles.snapshotTitle}>Average sleep</Text>
-                <Text style={styles.snapshotValue}>{averageSleep !== null ? `${averageSleep} hours` : "Not enough data"}</Text>
+                <Text style={styles.snapshotValue}>{averageSleep !== null ? `${averageSleep} hours` : "Not recorded yet"}</Text>
               </View>
               <View style={styles.snapshotCard}>
                 <Text style={styles.snapshotIcon}>✦</Text>
                 <Text style={styles.snapshotTitle}>Average energy</Text>
-                <Text style={styles.snapshotValue}>{averageEnergy !== null ? `${averageEnergy}/10` : "Not enough data"}</Text>
+                <Text style={styles.snapshotValue}>{averageEnergy !== null ? `${averageEnergy}/10` : "Not recorded yet"}</Text>
               </View>
             </View>
+
+            {missingBaselineAreas.length > 0 ? (
+              <View style={styles.insightCard}>
+                <Text style={styles.insightLabel}>BUILDING YOUR BASELINE</Text>
+                <Text style={styles.insightText}>
+                  You have recorded {recordedDays.length} {recordedDays.length === 1 ? "day" : "days"}, but APRIL does not have enough recorded {missingBaselineAreas.length === 2 ? "sleep or energy entries" : `${missingBaselineAreas[0]} entries`} yet to summarize {missingBaselineAreas.length === 2 ? "those areas" : `that area`}.
+                </Text>
+                <Pressable style={styles.secondaryButton} onPress={beginCheckIn}>
+                  <Text style={styles.secondaryButtonText}>Add another check-in</Text>
+                </Pressable>
+              </View>
+            ) : null}
 
             {latestMood ? (
               <View style={styles.insightCard}>
