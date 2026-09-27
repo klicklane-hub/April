@@ -1136,7 +1136,7 @@ export default function HomeScreen() {
     const describeChange = (recent: number | null, earlier: number | null, unit: string) => {
       if (recent === null || earlier === null || Math.abs(recent - earlier) < 0.5) return null;
       const earlierCount = earlierDays.size;
-      return `Your recorded ${unit} has been ${recent > earlier ? "higher" : "lower"} across your most recent recorded days (${recent.toFixed(1)} vs ${earlier.toFixed(1)} across the earlier ${earlierCount === 1 ? "day" : "days"}).`;
+      return `Your recorded ${unit} has been ${recent > earlier ? "higher" : "lower"} across your most recent recorded ${recentDays.size === 1 ? "day" : "days"} (${recent.toFixed(1)} vs ${earlier.toFixed(1)} across the earlier ${earlierCount === 1 ? "day" : "days"}).`;
     };
     const energyChangeNote = describeChange(numericAverage(recentEnergy), numericAverage(earlierEnergy), "energy");
     const sleepChangeNote = describeChange(numericAverage(recentSleep), numericAverage(earlierSleep), "sleep");
@@ -1226,7 +1226,7 @@ export default function HomeScreen() {
                     APRIL does not see a clear difference of 0.5 or more in your recorded sleep or energy between these periods.
                   </Text>
                 ) : null}
-                <Text style={styles.insightHint}>This compares your three most recent recorded days with earlier recorded days.</Text>
+                <Text style={styles.insightHint}>This compares your {recentDays.size} most recent recorded {recentDays.size === 1 ? "day" : "days"} with {earlierDays.size} earlier recorded {earlierDays.size === 1 ? "day" : "days"}.</Text>
               </View>
             ) : null}
 
