@@ -939,6 +939,11 @@ export default function HomeScreen() {
       <Text style={styles.screenSubtitle}>
         Things you choose to record will appear here in chronological order.
       </Text>
+      {!healthLoading && healthEntries.length > 0 ? (
+        <Text style={styles.timelineUpdated}>
+          Last recorded · {new Date(healthEntries[0].occurred_at || healthEntries[0].created_at).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}
+        </Text>
+      ) : null}
       {healthLoading ? (
         <View style={styles.emptyCard}><ActivityIndicator color="#E8A33D" /><Text style={styles.emptyText}>Loading your health story…</Text></View>
       ) : healthEntries.length === 0 ? (
@@ -1793,6 +1798,7 @@ const styles = StyleSheet.create({
   filterChipTextActive: {
     color: "#E8A33D",
   },
+  timelineUpdated: { color: "#777D89", fontSize: 12, marginTop: -18, marginBottom: 18 },
   timeline: { marginTop: 8 },
   timelineItem: { flexDirection: "row", marginBottom: 12 },
   timelineDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#E8A33D", marginTop: 24, marginRight: 12 },
