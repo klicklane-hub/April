@@ -225,7 +225,20 @@ export default function HomeScreen() {
       if (spoken) {
         const key = checkInQuestions[checkInStepRef.current]?.key;
         if (key) {
+          const numericMatch = spoken.match(/\d+(?:\.\d+)?/);
+          const numericValue = numericMatch ? Number(numericMatch[0]) : null;
+          if (key === "sleepHours" && numericValue !== null && numericValue > 24) {
+            setCheckInVoiceError(false);
+            setCheckInMessage("Please give your sleep in hours, up to 24. You can try again or type your answer.");
+            return;
+          }
+          if (key === "energyLevel" && numericValue !== null && numericValue > 10) {
+            setCheckInVoiceError(false);
+            setCheckInMessage("Please give your energy from 0 to 10. You can try again or type your answer.");
+            return;
+          }
           setCheckInAnswers((current) => ({ ...current, [key]: spoken }));
+          setCheckInVoiceError(false);
           setCheckInMessage("I heard you. Let me think about that…");
           const reply = await askApril(spoken, [
             { role: "assistant", content: checkInQuestions[checkInStepRef.current]?.title ?? "" },
