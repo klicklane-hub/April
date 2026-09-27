@@ -802,6 +802,7 @@ export default function HomeScreen() {
           <Text style={styles.screenTitle}>Thank you for checking in.</Text>
           <Text style={styles.screenSubtitle}>I’ve saved what you shared so you can come back to it later.</Text>
           {todayCheckIn?.checked_in_at ? <Text style={styles.checkInRecorded}>Recorded · {new Date(todayCheckIn.checked_in_at).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</Text> : null}
+          {checkInMessage ? <Text style={styles.checkInMessage}>{checkInMessage}</Text> : null}
           <View style={styles.checkInSummaryCard}>
             <Text style={styles.summaryLabel}>TODAY’S CHECK-IN</Text>
             {checkInAnswers.overallFeeling ? <Text style={styles.summaryText}>{checkInAnswers.overallFeeling}</Text> : null}
