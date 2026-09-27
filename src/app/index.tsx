@@ -1066,12 +1066,12 @@ export default function HomeScreen() {
               <View style={styles.snapshotCard}>
                 <Text style={styles.snapshotIcon}>◷</Text>
                 <Text style={styles.snapshotTitle}>Average sleep</Text>
-                <Text style={styles.snapshotValue}>{averageSleep ? `${averageSleep} hours` : "Not enough data"}</Text>
+                <Text style={styles.snapshotValue}>{averageSleep !== null ? `${averageSleep} hours` : "Not enough data"}</Text>
               </View>
               <View style={styles.snapshotCard}>
                 <Text style={styles.snapshotIcon}>✦</Text>
                 <Text style={styles.snapshotTitle}>Average energy</Text>
-                <Text style={styles.snapshotValue}>{averageEnergy ? `${averageEnergy}/10` : "Not enough data"}</Text>
+                <Text style={styles.snapshotValue}>{averageEnergy !== null ? `${averageEnergy}/10` : "Not enough data"}</Text>
               </View>
             </View>
 
