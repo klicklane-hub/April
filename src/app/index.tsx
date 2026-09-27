@@ -1227,7 +1227,19 @@ export default function HomeScreen() {
                 {sleepChangeNote && <Text style={[styles.insightText, energyChangeNote ? { marginTop: 8 } : null]}>{sleepChangeNote}</Text>}
                 {!energyChangeNote && !sleepChangeNote ? (
                   <Text style={styles.insightText}>
-                    APRIL does not see a clear difference of 0.5 or more in your recorded sleep or energy between these periods.
+                    {recentSleepEntryCount > 0 && earlierSleepEntryCount > 0 || recentEnergyEntryCount > 0 && earlierEnergyEntryCount > 0
+                      ? "APRIL does not see a clear difference of 0.5 or more in the measures that have recorded values in both periods."
+                      : "APRIL needs a recorded sleep or energy value in both comparison periods before it can describe a change for that measure."}
+                  </Text>
+                ) : null}
+                {recentSleepEntryCount > 0 && earlierSleepEntryCount > 0 ? (
+                  <Text style={styles.insightHint}>
+                    Sleep comparison: {recentSleepEntryCount} recent recorded {recentSleepEntryCount === 1 ? "entry" : "entries"} vs {earlierSleepEntryCount} earlier recorded {earlierSleepEntryCount === 1 ? "entry" : "entries"}.
+                  </Text>
+                ) : null}
+                {recentEnergyEntryCount > 0 && earlierEnergyEntryCount > 0 ? (
+                  <Text style={[styles.insightHint, recentSleepEntryCount > 0 && earlierSleepEntryCount > 0 ? { marginTop: 5 } : null]}>
+                    Energy comparison: {recentEnergyEntryCount} recent recorded {recentEnergyEntryCount === 1 ? "entry" : "entries"} vs {earlierEnergyEntryCount} earlier recorded {earlierEnergyEntryCount === 1 ? "entry" : "entries"}.
                   </Text>
                 ) : null}
                 <Text style={styles.insightHint}>
