@@ -860,13 +860,13 @@ export default function HomeScreen() {
 
       <Pressable style={styles.checkInCard} onPress={todayCheckIn ? reviewTodayCheckIn : beginCheckIn}>
         <View>
-          <Text style={styles.checkInLabel}>DAILY CHECK-IN</Text>
+          <Text style={styles.checkInLabel}>{todayCheckIn ? "TODAY’S CHECK-IN" : "DAILY CHECK-IN"}</Text>
           <Text style={styles.checkInTitle}>
-            {todayCheckIn ? "Check-in completed today." : "Take a moment for yourself."}
+            {todayCheckIn ? "Review today’s check-in." : "Take a moment for yourself."}
           </Text>
           <Text style={styles.checkInSubtitle}>
             {todayCheckIn
-              ? "You can check in again anytime if something has changed."
+              ? "See what you recorded, or start another check-in if something has changed."
               : "A short conversation can help you notice how you’re doing."}
           </Text>
         </View>
