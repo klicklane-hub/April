@@ -203,6 +203,24 @@ export default function HomeScreen() {
           ]);
           setCheckInMessage(reply);
           speakAprilResponse(reply);
+
+          const currentStep = checkInStepRef.current;
+          if (currentStep < checkInQuestions.length - 1) {
+            const nextStep = currentStep + 1;
+            setCheckInStep(nextStep);
+            checkInStepRef.current = nextStep;
+            window.setTimeout(() => {
+              setCheckInMessage("APRIL is asking…");
+              speakCheckInQuestion(checkInQuestions[nextStep].title, () => {
+                startCheckInVoice();
+              });
+            }, Platform.OS === "web" ? 700 : 0);
+          } else {
+            setCheckInMessage("That’s your check-in complete. Saving what you shared…");
+            window.setTimeout(() => {
+              saveCheckIn();
+            }, Platform.OS === "web" ? 700 : 0);
+          }
         }
       } else {
         setCheckInMessage("I didn’t catch that. You can try again or type your answer.");
