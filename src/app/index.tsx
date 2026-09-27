@@ -1246,6 +1246,13 @@ export default function HomeScreen() {
                   This compares your {recentDays.size} most recent recorded {recentDays.size === 1 ? "day" : "days"} with {earlierDays.size} earlier recorded {earlierDays.size === 1 ? "day" : "days"}. APRIL only averages days that have a recorded value for each measure.
                 </Text>
               </View>
+            ) : recordedDays.length >= 2 ? (
+              <View style={styles.insightCard}>
+                <Text style={styles.insightLabel}>RECENT CHANGE</Text>
+                <Text style={styles.insightText}>
+                  Keep recording for a little longer. APRIL compares recent changes only after 4 recorded days, so there is enough of your own history to compare two periods.
+                </Text>
+              </View>
             ) : null}
 
             <View style={styles.insightCard}>
