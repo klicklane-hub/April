@@ -50,6 +50,7 @@ export default function HomeScreen() {
   const [todayCheckIn, setTodayCheckIn] = useState<any>(null);
   const [healthEntries, setHealthEntries] = useState<any[]>([]);
   const [healthLoading, setHealthLoading] = useState(false);
+  const [healthLoadError, setHealthLoadError] = useState(false);
   const [healthFilter, setHealthFilter] = useState<"all" | "sleep" | "energy" | "mood" | "symptom">("all");
   const [editingName, setEditingName] = useState(false);
   const [nameSaving, setNameSaving] = useState(false);
@@ -128,6 +129,7 @@ export default function HomeScreen() {
   const loadHealthData = async () => {
     if (!sessionUser) return;
     setHealthLoading(true);
+    setHealthLoadError(false);
     const start = new Date();
     start.setHours(0, 0, 0, 0);
     const { data: checkIn } = await supabase
@@ -138,12 +140,18 @@ export default function HomeScreen() {
       .order("checked_in_at", { ascending: false })
       .limit(1)
       .maybeSingle();
-    const { data: entries } = await supabase
+    const { data: entries, error: entriesError } = await supabase
       .from("health_entries")
       .select("id, category, title, content, severity, occurred_at, created_at")
       .eq("user_id", sessionUser.id)
       .order("occurred_at", { ascending: false })
       .limit(30);
+    if (entriesError) {
+      console.log("APRIL health story load error:", entriesError.message);
+      setHealthLoadError(true);
+      setHealthLoading(false);
+      return;
+    }
     setTodayCheckIn(checkIn ?? null);
     setHealthEntries(entries ?? []);
     setHealthLoading(false);
@@ -1067,6 +1075,14 @@ export default function HomeScreen() {
       ) : null}
       {healthLoading ? (
         <View style={styles.emptyCard}><ActivityIndicator color="#E8A33D" /><Text style={styles.emptyText}>Loading your health story…</Text></View>
+      ) : healthLoadError ? (
+        <View style={styles.emptyCard}>
+          <Text style={styles.emptyTitle}>Your health story couldn’t be loaded.</Text>
+          <Text style={styles.emptyText}>Your recorded information has not been changed. Please try again.</Text>
+          <Pressable style={styles.secondaryButton} onPress={loadHealthData}>
+            <Text style={styles.secondaryButtonText}>Try again</Text>
+          </Pressable>
+        </View>
       ) : healthEntries.length === 0 ? (
         <View style={styles.emptyCard}>
           <Text style={styles.emptyTitle}>Nothing recorded yet.</Text>
