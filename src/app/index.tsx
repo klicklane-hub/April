@@ -794,7 +794,8 @@ export default function HomeScreen() {
     }
     const permission = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert("Microphone permission needed", "APRIL needs microphone access when you choose to answer by voice.");
+      setCheckInVoiceError(true);
+      setCheckInMessage("Microphone access is needed to answer by voice. You can allow it in your browser or device settings, or type your answer below.");
       return;
     }
     checkInVoiceActive.current = true;
@@ -802,11 +803,18 @@ export default function HomeScreen() {
     setTranscript("");
     setCheckInVoiceError(false);
     setCheckInMessage("Listening…");
-    ExpoSpeechRecognitionModule.start({
-      lang: "en-US",
-      interimResults: true,
-      continuous: false,
-    });
+    try {
+      ExpoSpeechRecognitionModule.start({
+        lang: "en-US",
+        interimResults: true,
+        continuous: false,
+      });
+    } catch (error: any) {
+      console.log("APRIL check-in microphone start error:", error?.message || String(error));
+      checkInVoiceActive.current = false;
+      setCheckInVoiceError(true);
+      setCheckInMessage("I couldn’t start the microphone. You can try again or type your answer below.");
+    }
   };
 
   const nextCheckInStep = async () => {
