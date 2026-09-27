@@ -391,6 +391,7 @@ export default function HomeScreen() {
       await ExpoSpeechRecognitionModule.requestPermissionsAsync();
 
     if (!permission.granted) {
+      setTalkStatus("idle");
       Alert.alert(
         "Microphone permission needed",
         "APRIL needs microphone access when you choose to talk."
@@ -402,11 +403,18 @@ export default function HomeScreen() {
     setAprilResponse("");
     latestTranscript.current = "";
 
-    ExpoSpeechRecognitionModule.start({
-      lang: "en-US",
-      interimResults: true,
-      continuous: false,
-    });
+    try {
+      ExpoSpeechRecognitionModule.start({
+        lang: "en-US",
+        interimResults: true,
+        continuous: false,
+      });
+    } catch (error: any) {
+      console.log("APRIL microphone start error:", error?.message || String(error));
+      setIsListening(false);
+      setTalkStatus("idle");
+      setAprilResponse("I couldn’t start the microphone. Please try again.");
+    }
   };
 
   const stopListening = () => {
