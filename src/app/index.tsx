@@ -606,6 +606,20 @@ export default function HomeScreen() {
     setActiveTab("checkin");
   };
 
+  const reviewTodayCheckIn = () => {
+    if (!todayCheckIn) return;
+    setCheckInAnswers({
+      overallFeeling: todayCheckIn.overall_feeling ?? "",
+      sleepHours: todayCheckIn.sleep_hours != null ? String(todayCheckIn.sleep_hours) : "",
+      energyLevel: todayCheckIn.energy_level != null ? String(todayCheckIn.energy_level) : "",
+      emotionalState: todayCheckIn.emotional_state ?? "",
+      physicalConcerns: todayCheckIn.physical_concerns ?? "",
+    });
+    setCheckInComplete(true);
+    setCheckInMessage("");
+    setActiveTab("checkin");
+  };
+
   const updateCheckInAnswer = (value: string) => {
     const key = checkInQuestions[checkInStep].key;
     setCheckInAnswers((current) => ({ ...current, [key]: value }));
@@ -726,7 +740,7 @@ export default function HomeScreen() {
             {checkInAnswers.emotionalState ? <Text style={styles.summaryLine}>Emotion · {checkInAnswers.emotionalState}</Text> : null}
             {checkInAnswers.physicalConcerns ? <Text style={styles.summaryLine}>Physical · {checkInAnswers.physicalConcerns}</Text> : null}
           </View>
-          <Pressable style={styles.button} onPress={() => handleTabChange("home")}><Text style={styles.buttonText}>Back to today</Text></Pressable>
+          <Pressable style={styles.button} onPress={() => handleTabChange("home")}><Text style={styles.buttonText}>{todayCheckIn ? "Back to today" : "Back to today"}</Text></Pressable>
           <Pressable style={styles.secondaryButton} onPress={() => handleTabChange("health")}><Text style={styles.secondaryButtonText}>View my health story</Text></Pressable>
         </ScrollView>
       );
@@ -825,7 +839,7 @@ export default function HomeScreen() {
         </View>
       ) : null}
 
-      <Pressable style={styles.checkInCard} onPress={beginCheckIn}>
+      <Pressable style={styles.checkInCard} onPress={todayCheckIn ? reviewTodayCheckIn : beginCheckIn}>
         <View>
           <Text style={styles.checkInLabel}>DAILY CHECK-IN</Text>
           <Text style={styles.checkInTitle}>
