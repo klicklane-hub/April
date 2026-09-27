@@ -790,6 +790,15 @@ export default function HomeScreen() {
         </View>
       </View>
 
+      {todayCheckIn ? (
+        <View style={styles.todayNoteCard}>
+          <Text style={styles.insightLabel}>TODAY’S CHECK-IN</Text>
+          {todayCheckIn.overall_feeling ? <Text style={styles.todayNoteText}>{todayCheckIn.overall_feeling}</Text> : null}
+          {todayCheckIn.emotional_state ? <Text style={styles.todayNoteMeta}>Emotion · {todayCheckIn.emotional_state}</Text> : null}
+          {todayCheckIn.physical_concerns ? <Text style={styles.todayNoteMeta}>Physical · {todayCheckIn.physical_concerns}</Text> : null}
+        </View>
+      ) : null}
+
       <Pressable style={styles.checkInCard} onPress={beginCheckIn}>
         <View>
           <Text style={styles.checkInLabel}>DAILY CHECK-IN</Text>
@@ -1421,6 +1430,12 @@ const styles = StyleSheet.create({
   checkInSubtitle: { color: "#A7ACB8", fontSize: 12, lineHeight: 18, marginTop: 5, paddingRight: 12 },
 
   checkInArrow: { color: "#E8A33D", fontSize: 24 },
+
+  todayNoteCard: { backgroundColor: "#151A24", borderRadius: 18, padding: 18, marginBottom: 14, borderWidth: 1, borderColor: "#252C39" },
+
+  todayNoteText: { color: "#FFFFFF", fontSize: 16, lineHeight: 23, marginTop: 8 },
+
+  todayNoteMeta: { color: "#A7ACB8", fontSize: 13, lineHeight: 20, marginTop: 8 },
 
   insightCard: {
     backgroundColor: "#151A24",
