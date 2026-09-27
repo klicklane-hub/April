@@ -214,6 +214,7 @@ export default function HomeScreen() {
       setAprilResponse("Thinking…");
       askApril(spoken, transcript ? [{ role: "user", content: transcript }] : []).then((reply) => {
         setAprilResponse(reply);
+        speakAprilResponse(reply);
       });
     }
   });
