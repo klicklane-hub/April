@@ -360,13 +360,14 @@ export default function HomeScreen() {
   };
 
   const askApril = async (message: string, context: { role: string; content: string }[] = []) => {
-    const { data, error } = await supabase.functions.invoke("april-conversation", {
-      body: { message, context },
-    });
-    if (error) {
-      console.log("APRIL conversation error:", error.message);
-      return "I’m here with you. I can still record what you share.";
-    }
+    try {
+      const { data, error } = await supabase.functions.invoke("april-conversation", {
+        body: { message, context },
+      });
+      if (error) {
+        console.log("APRIL conversation error:", error.message);
+        return "I’m here with you. I can still record what you share.";
+      }
 
     if (data?.diagnostic) {
       console.log("APRIL conversation diagnostic:", data.diagnostic);
@@ -383,7 +384,12 @@ export default function HomeScreen() {
       return messages[data.diagnostic] ?? "My conversation service needs attention.";
     }
 
-    return data?.reply ?? "I’m listening. Tell me a little more.";
+      return data?.reply ?? "I’m listening. Tell me a little more.";
+    } catch (error: any) {
+      const detail = error?.message || String(error);
+      console.log("APRIL conversation exception:", detail);
+      return "I’m here with you. Something interrupted our conversation. You can try again.";
+    }
   };
 
   const startListening = async () => {
