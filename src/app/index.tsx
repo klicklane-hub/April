@@ -1178,7 +1178,7 @@ export default function HomeScreen() {
             <View style={styles.snapshotRow}>
               <View style={styles.snapshotCard}>
                 <Text style={styles.snapshotIcon}>◷</Text>
-                <Text style={styles.snapshotTitle}>Average sleep</Text>
+                <Text style={styles.snapshotTitle}>{sleepValues.length === 1 ? "Recorded sleep" : "Average sleep"}</Text>
                 <Text style={styles.snapshotValue}>{averageSleep !== null ? `${averageSleep} hours` : "Not recorded yet"}</Text>
                 {averageSleep !== null ? (
                   <Text style={styles.snapshotMeta}>{sleepValues.length} recorded {sleepValues.length === 1 ? "entry" : "entries"}</Text>
@@ -1186,7 +1186,7 @@ export default function HomeScreen() {
               </View>
               <View style={styles.snapshotCard}>
                 <Text style={styles.snapshotIcon}>✦</Text>
-                <Text style={styles.snapshotTitle}>Average energy</Text>
+                <Text style={styles.snapshotTitle}>{energyValues.length === 1 ? "Recorded energy" : "Average energy"}</Text>
                 <Text style={styles.snapshotValue}>{averageEnergy !== null ? `${averageEnergy}/10` : "Not recorded yet"}</Text>
                 {averageEnergy !== null ? (
                   <Text style={styles.snapshotMeta}>{energyValues.length} recorded {energyValues.length === 1 ? "entry" : "entries"}</Text>
