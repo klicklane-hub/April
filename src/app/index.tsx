@@ -438,6 +438,7 @@ export default function HomeScreen() {
     if (isListening) {
       ExpoSpeechRecognitionModule.stop();
     }
+    checkInVoiceActive.current = false;
     talkContext.current = [];
     latestTranscript.current = "";
     setIsListening(false);
