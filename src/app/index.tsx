@@ -39,6 +39,7 @@ export default function HomeScreen() {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [aprilResponse, setAprilResponse] = useState("");
+  const [talkStatus, setTalkStatus] = useState<"idle" | "listening" | "thinking" | "speaking">("idle");
   const [checkInStep, setCheckInStep] = useState(0);
   const [checkInAnswers, setCheckInAnswers] = useState({ overallFeeling: "", sleepHours: "", energyLevel: "", emotionalState: "", physicalConcerns: "" });
   const [checkInSaving, setCheckInSaving] = useState(false);
@@ -176,17 +177,23 @@ export default function HomeScreen() {
   });
 
   const speakAprilResponse = (text: string) => {
-    if (Platform.OS !== "web" || typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    if (Platform.OS !== "web" || typeof window === "undefined" || !("speechSynthesis" in window)) {
+      setTalkStatus("idle");
+      return;
+    }
+    setTalkStatus("speaking");
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 0.92;
     utterance.pitch = 1.02;
     utterance.volume = 1;
+    utterance.onend = () => setTalkStatus("idle");
     window.speechSynthesis.speak(utterance);
   };
 
   useSpeechRecognitionEvent("end", async () => {
     setIsListening(false);
+    if (!checkInVoiceActive.current) setTalkStatus("thinking");
     const spoken = latestTranscript.current.trim();
 
     if (checkInVoiceActive.current) {
@@ -390,8 +397,10 @@ export default function HomeScreen() {
 
   const handleTalk = () => {
     if (isListening) {
+      setTalkStatus("thinking");
       stopListening();
     } else {
+      setTalkStatus("listening");
       startListening();
     }
   };
@@ -868,6 +877,13 @@ export default function HomeScreen() {
           <Text style={styles.response}>{aprilResponse}</Text>
         </View>
       )}
+
+      <Text style={styles.voiceStatus}>
+        {talkStatus === "listening" ? "APRIL is listening…" :
+          talkStatus === "thinking" ? "APRIL is thinking…" :
+          talkStatus === "speaking" ? "APRIL is speaking…" :
+          "Ready when you are."}
+      </Text>
 
       <Pressable
         style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
