@@ -327,13 +327,13 @@ export default function HomeScreen() {
     if (data?.diagnostic) {
       console.log("APRIL conversation diagnostic:", data.diagnostic);
       const messages: Record<string, string> = {
-        OPENAI_API_KEY_MISSING: "My conversation service still needs its OpenAI connection.",
-        OPENAI_API_KEY_REJECTED: "My conversation service is rejecting its OpenAI connection.",
-        OPENAI_ACCESS_DENIED: "My conversation service does not currently have access to the OpenAI model.",
-        OPENAI_MODEL_OR_ENDPOINT_NOT_FOUND: "My conversation service cannot reach the selected AI model.",
-        OPENAI_QUOTA_OR_RATE_LIMIT: "My conversation service has reached its OpenAI usage limit.",
-        OPENAI_PROVIDER_ERROR: "The OpenAI conversation service is temporarily unavailable.",
-        OPENAI_REQUEST_REJECTED: "The OpenAI conversation request was rejected.",
+        GROQ_API_KEY_MISSING: "My conversation service is not connected yet.",
+        GROQ_API_KEY_REJECTED: "My conversation service could not authenticate.",
+        GROQ_ACCESS_DENIED: "My conversation service does not currently have access to its AI provider.",
+        GROQ_MODEL_OR_ENDPOINT_NOT_FOUND: "My conversation service cannot reach its AI model.",
+        GROQ_QUOTA_OR_RATE_LIMIT: "My conversation service is temporarily busy. Please try again shortly.",
+        GROQ_PROVIDER_ERROR: "My conversation service is temporarily unavailable.",
+        GROQ_REQUEST_REJECTED: "My conversation request was rejected. Please try again.",
         APRIL_FUNCTION_ERROR: "Something interrupted APRIL’s conversation service.",
       };
       return messages[data.diagnostic] ?? "My conversation service needs attention.";
