@@ -1397,7 +1397,19 @@ export default function HomeScreen() {
         <Text style={styles.settingHint}>APRIL helps you notice changes and organize what you experience. It does not replace a healthcare professional.</Text>
       </View>
 
-      <Pressable style={styles.signOutButton} onPress={() => supabase.auth.signOut()}>
+      <Pressable
+        style={styles.signOutButton}
+        onPress={() =>
+          Alert.alert(
+            "Sign out of APRIL?",
+            "You can sign back in later and your saved health information will remain in your account.",
+            [
+              { text: "Cancel", style: "cancel" },
+              { text: "Sign out", style: "destructive", onPress: () => supabase.auth.signOut() },
+            ]
+          )
+        }
+      >
         <Text style={styles.signOutText}>Sign out</Text>
       </Pressable>
     </ScrollView>
