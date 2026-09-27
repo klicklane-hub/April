@@ -1059,21 +1059,33 @@ export default function HomeScreen() {
       values.length ? (values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(1) : null;
     const numericAverage = (values: number[]) =>
       values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : null;
-    const recentEntries = healthEntries.slice(0, 3);
-    const recentEnergy = recentEntries.filter((entry) => entry.category === "energy").map((entry) => Number(entry.content)).filter((v) => Number.isFinite(v) && v >= 0 && v <= 10);
-    const earlierEnergy = healthEntries.slice(3).filter((entry) => entry.category === "energy").map((entry) => Number(entry.content)).filter((v) => Number.isFinite(v) && v >= 0 && v <= 10);
-    const recentSleep = recentEntries.filter((entry) => entry.category === "sleep").map((entry) => Number(entry.content)).filter((v) => Number.isFinite(v) && v > 0 && v <= 24);
-    const earlierSleep = healthEntries.slice(3).filter((entry) => entry.category === "sleep").map((entry) => Number(entry.content)).filter((v) => Number.isFinite(v) && v > 0 && v <= 24);
+    const dayKey = (entry: any) => {
+      const value = entry.occurred_at ?? entry.created_at;
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? "unknown" : date.toISOString().slice(0, 10);
+    };
+    const recordedDays = Array.from(new Set(healthEntries.map(dayKey).filter((day) => day !== "unknown")));
+    const recentDays = new Set(recordedDays.slice(0, 3));
+    const earlierDays = new Set(recordedDays.slice(3));
+    const valuesForDays = (category: string, days: Set<string>, min: number, max: number) =>
+      healthEntries
+        .filter((entry) => entry.category === category && days.has(dayKey(entry)))
+        .map((entry) => Number(entry.content))
+        .filter((value) => Number.isFinite(value) && value >= min && value <= max);
+    const recentEnergy = valuesForDays("energy", recentDays, 0, 10);
+    const earlierEnergy = valuesForDays("energy", earlierDays, 0, 10);
+    const recentSleep = valuesForDays("sleep", recentDays, 0.01, 24);
+    const earlierSleep = valuesForDays("sleep", earlierDays, 0.01, 24);
     const describeChange = (recent: number | null, earlier: number | null, unit: string) => {
       if (recent === null || earlier === null || Math.abs(recent - earlier) < 0.5) return null;
-      return `Your recorded ${unit} has been ${recent > earlier ? "higher" : "lower"} in your most recent entries (${recent.toFixed(1)} vs ${earlier.toFixed(1)} earlier).`;
+      return `Your recorded ${unit} has been ${recent > earlier ? "higher" : "lower"} across your most recent recorded days (${recent.toFixed(1)} vs ${earlier.toFixed(1)} on earlier recorded days).`;
     };
     const energyChangeNote = describeChange(numericAverage(recentEnergy), numericAverage(earlierEnergy), "energy");
     const sleepChangeNote = describeChange(numericAverage(recentSleep), numericAverage(earlierSleep), "sleep");
     const averageSleep = average(sleepValues);
     const averageEnergy = average(energyValues);
     const latestMood = healthEntries.find((entry) => entry.category === "mood");
-    const hasEnoughHistory = sleepValues.length + energyValues.length >= 2 || healthEntries.length >= 3;
+    const hasEnoughHistory = recordedDays.length >= 2;
 
     return (
       <ScrollView contentContainerStyle={styles.dashboardContent}>
@@ -1122,7 +1134,7 @@ export default function HomeScreen() {
                 <Text style={styles.insightLabel}>RECENT CHANGE</Text>
                 {energyChangeNote && <Text style={styles.insightText}>{energyChangeNote}</Text>}
                 {sleepChangeNote && <Text style={[styles.insightText, energyChangeNote ? { marginTop: 8 } : null]}>{sleepChangeNote}</Text>}
-                <Text style={styles.insightHint}>This compares your recent recorded entries with earlier entries.</Text>
+                <Text style={styles.insightHint}>This compares your three most recent recorded days with earlier recorded days.</Text>
               </View>
             )}
 
