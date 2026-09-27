@@ -51,6 +51,7 @@ export default function HomeScreen() {
   const [healthEntries, setHealthEntries] = useState<any[]>([]);
   const [healthLoading, setHealthLoading] = useState(false);
   const [healthLoadError, setHealthLoadError] = useState(false);
+  const [todayCheckInLoadError, setTodayCheckInLoadError] = useState(false);
   const [healthFilter, setHealthFilter] = useState<"all" | "sleep" | "energy" | "mood" | "symptom">("all");
   const [editingName, setEditingName] = useState(false);
   const [nameSaving, setNameSaving] = useState(false);
@@ -130,9 +131,10 @@ export default function HomeScreen() {
     if (!sessionUser) return;
     setHealthLoading(true);
     setHealthLoadError(false);
+    setTodayCheckInLoadError(false);
     const start = new Date();
     start.setHours(0, 0, 0, 0);
-    const { data: checkIn } = await supabase
+    const { data: checkIn, error: checkInError } = await supabase
       .from("check_ins")
       .select("id, overall_feeling, sleep_hours, energy_level, emotional_state, physical_concerns, checked_in_at")
       .eq("user_id", sessionUser.id)
@@ -140,6 +142,10 @@ export default function HomeScreen() {
       .order("checked_in_at", { ascending: false })
       .limit(1)
       .maybeSingle();
+    if (checkInError) {
+      console.log("APRIL today check-in load error:", checkInError.message);
+      setTodayCheckInLoadError(true);
+    }
     const { data: entries, error: entriesError } = await supabase
       .from("health_entries")
       .select("id, category, title, content, severity, occurred_at, created_at")
@@ -927,6 +933,17 @@ export default function HomeScreen() {
         <Text style={styles.sectionTitle}>Today</Text>
         <Text style={styles.sectionHint}>Your health, at a glance</Text>
       </View>
+
+      {todayCheckInLoadError ? (
+        <View style={styles.todayNoteCard}>
+          <Text style={styles.insightLabel}>TODAY’S CHECK-IN</Text>
+          <Text style={styles.todayNoteText}>Today’s check-in could not be loaded right now.</Text>
+          <Text style={styles.todayNoteMeta}>Your saved health information has not been changed.</Text>
+          <Pressable style={styles.secondaryButton} onPress={loadHealthData}>
+            <Text style={styles.secondaryButtonText}>Try again</Text>
+          </Pressable>
+        </View>
+      ) : null}
 
       <View style={styles.snapshotRow}>
         <View style={styles.snapshotCard}>
