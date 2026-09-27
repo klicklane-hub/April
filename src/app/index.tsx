@@ -1138,6 +1138,10 @@ export default function HomeScreen() {
       const earlierCount = earlierDays.size;
       return `Your recorded ${unit} has been ${recent > earlier ? "higher" : "lower"} across your most recent recorded ${recentDays.size === 1 ? "day" : "days"} (${recent.toFixed(1)} vs ${earlier.toFixed(1)} across the earlier ${earlierCount === 1 ? "day" : "days"}).`;
     };
+    const recentSleepEntryCount = valuesForDays("sleep", recentDays, 0.01, 24).length;
+    const earlierSleepEntryCount = valuesForDays("sleep", earlierDays, 0.01, 24).length;
+    const recentEnergyEntryCount = valuesForDays("energy", recentDays, 0, 10).length;
+    const earlierEnergyEntryCount = valuesForDays("energy", earlierDays, 0, 10).length;
     const energyChangeNote = describeChange(numericAverage(recentEnergy), numericAverage(earlierEnergy), "energy");
     const sleepChangeNote = describeChange(numericAverage(recentSleep), numericAverage(earlierSleep), "sleep");
     const averageSleep = average(sleepValues);
@@ -1226,7 +1230,9 @@ export default function HomeScreen() {
                     APRIL does not see a clear difference of 0.5 or more in your recorded sleep or energy between these periods.
                   </Text>
                 ) : null}
-                <Text style={styles.insightHint}>This compares your {recentDays.size} most recent recorded {recentDays.size === 1 ? "day" : "days"} with {earlierDays.size} earlier recorded {earlierDays.size === 1 ? "day" : "days"}.</Text>
+                <Text style={styles.insightHint}>
+                  This compares your {recentDays.size} most recent recorded {recentDays.size === 1 ? "day" : "days"} with {earlierDays.size} earlier recorded {earlierDays.size === 1 ? "day" : "days"}. APRIL only averages days that have a recorded value for each measure.
+                </Text>
               </View>
             ) : null}
 
