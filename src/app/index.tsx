@@ -49,6 +49,9 @@ export default function HomeScreen() {
   const [healthEntries, setHealthEntries] = useState<any[]>([]);
   const [healthLoading, setHealthLoading] = useState(false);
   const [healthFilter, setHealthFilter] = useState<"all" | "sleep" | "energy" | "mood" | "symptom">("all");
+  const [editingName, setEditingName] = useState(false);
+  const [nameSaving, setNameSaving] = useState(false);
+  const [nameMessage, setNameMessage] = useState("");
 
   const pulse = useRef(new Animated.Value(1)).current;
   const latestTranscript = useRef("");
@@ -1089,6 +1092,53 @@ export default function HomeScreen() {
       <View style={styles.settingsCard}>
         <Text style={styles.settingLabel}>ACCOUNT</Text>
         <Text style={styles.settingValue}>{sessionUser.email}</Text>
+        {editingName ? (
+          <>
+            <TextInput
+              style={styles.nameInput}
+              value={profileName}
+              onChangeText={setProfileName}
+              placeholder="Your name"
+              placeholderTextColor="#777D89"
+              autoFocus
+            />
+            {nameMessage ? <Text style={styles.settingHint}>{nameMessage}</Text> : null}
+            <View style={styles.nameActions}>
+              <Pressable
+                style={styles.secondaryButton}
+                onPress={() => { setEditingName(false); setNameMessage(""); }}
+                disabled={nameSaving}
+              >
+                <Text style={styles.secondaryButtonText}>Cancel</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.button, nameSaving && styles.buttonDisabled]}
+                disabled={nameSaving}
+                onPress={async () => {
+                  if (!sessionUser) return;
+                  const name = profileName.trim();
+                  if (!name) { setNameMessage("Enter a name to continue."); return; }
+                  setNameSaving(true);
+                  setNameMessage("");
+                  const { error } = await supabase.from("profiles").update({ display_name: name }).eq("id", sessionUser.id);
+                  setNameSaving(false);
+                  if (error) { setNameMessage("I couldn’t save that just yet."); return; }
+                  setEditingName(false);
+                }}
+              >
+                {nameSaving ? <ActivityIndicator color="#0B0E14" /> : <Text style={styles.buttonText}>Save name</Text>}
+              </Pressable>
+            </View>
+          </>
+        ) : (
+          <Pressable onPress={() => setEditingName(true)} style={styles.nameRow}>
+            <View style={styles.nameRowText}>
+              <Text style={styles.settingValue}>{profileName || "Add your name"}</Text>
+              <Text style={styles.settingHint}>Your name is used to personalize APRIL.</Text>
+            </View>
+            <Text style={styles.nameEdit}>Edit</Text>
+          </Pressable>
+        )}
       </View>
 
       <View style={styles.settingsCard}>
@@ -1589,6 +1639,34 @@ const styles = StyleSheet.create({
 
   settingValue: { color: "#FFFFFF", fontSize: 15, marginTop: 8 },
 
+  nameInput: {
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: "#2A2F3A",
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    color: "#F4F5F7",
+    fontSize: 15,
+  },
+  nameActions: {
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 12,
+    alignItems: "center",
+  },
+  nameRow: {
+    marginTop: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  nameRowText: { flex: 1, paddingRight: 12 },
+  nameEdit: {
+    color: "#E8A33D",
+    fontSize: 13,
+    fontWeight: "700",
+  },
   settingHint: { color: "#777D89", fontSize: 13, lineHeight: 19, marginTop: 7 },
 
   conversationButton: { marginTop: 18, minHeight: 56, borderRadius: 18, backgroundColor: "#E8A33D", alignItems: "center", justifyContent: "center" },
