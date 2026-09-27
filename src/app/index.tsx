@@ -252,12 +252,13 @@ export default function HomeScreen() {
             { role: "assistant", content: checkInQuestions[checkInStepRef.current]?.title ?? "" },
             { role: "user", content: spoken },
           ]);
-          setCheckInMessage(reply);
-          speakAprilResponse(reply);
 
           if (!checkInFlowActive.current) {
             return;
           }
+
+          setCheckInMessage(reply);
+          speakAprilResponse(reply);
 
           const currentStep = checkInStepRef.current;
           if (currentStep < checkInQuestions.length - 1) {
