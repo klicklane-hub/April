@@ -874,17 +874,37 @@ export default function HomeScreen() {
         </View>
       ) : (
         <View style={styles.timeline}>
-          {healthEntries.map((entry) => (
-            <View key={entry.id} style={styles.timelineItem}>
-              <View style={styles.timelineDot} />
-              <View style={styles.timelineCard}>
-                <Text style={styles.timelineCategory}>{String(entry.category).toUpperCase()}</Text>
-                <Text style={styles.timelineTitle}>{entry.title}</Text>
-                <Text style={styles.timelineText}>{entry.content}</Text>
-                <Text style={styles.timelineDate}>{new Date(entry.occurred_at || entry.created_at).toLocaleString()}</Text>
+          {healthEntries.map((entry) => {
+            const category = String(entry.category).toLowerCase();
+            const categoryLabel =
+              category === "sleep" ? "SLEEP" :
+              category === "energy" ? "ENERGY" :
+              category === "mood" ? "EMOTIONAL" :
+              category === "symptom" ? "PHYSICAL" : "NOTE";
+            const displayContent =
+              category === "sleep" ? `${entry.content} hours` :
+              category === "energy" ? `${entry.content}/10` :
+              String(entry.content);
+
+            return (
+              <View key={entry.id} style={styles.timelineItem}>
+                <View style={styles.timelineDot} />
+                <View style={styles.timelineCard}>
+                  <Text style={styles.timelineCategory}>{categoryLabel}</Text>
+                  <Text style={styles.timelineTitle}>{entry.title}</Text>
+                  <Text style={styles.timelineText}>{displayContent}</Text>
+                  <Text style={styles.timelineDate}>
+                    {new Date(entry.occurred_at || entry.created_at).toLocaleDateString(undefined, {
+                      weekday: "short",
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </Text>
+                </View>
               </View>
-            </View>
-          ))}
+            );
+          })}
         </View>
       )}
     </ScrollView>
