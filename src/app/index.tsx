@@ -915,8 +915,19 @@ export default function HomeScreen() {
         </View>
       ) : (
         <View style={styles.timeline}>
-          {healthEntries.map((entry) => {
+          {healthEntries.map((entry, index) => {
             const category = String(entry.category).toLowerCase();
+            const entryDate = new Date(entry.occurred_at || entry.created_at);
+            const previousEntry = healthEntries[index - 1];
+            const previousDate = previousEntry ? new Date(previousEntry.occurred_at || previousEntry.created_at) : null;
+            const isNewDay = !previousDate || entryDate.toDateString() !== previousDate.toDateString();
+            const today = new Date();
+            const yesterday = new Date();
+            yesterday.setDate(today.getDate() - 1);
+            const dayLabel =
+              entryDate.toDateString() === today.toDateString() ? "TODAY" :
+              entryDate.toDateString() === yesterday.toDateString() ? "YESTERDAY" :
+              entryDate.toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long", year: "numeric" }).toUpperCase();
             const categoryLabel =
               category === "sleep" ? "SLEEP" :
               category === "energy" ? "ENERGY" :
@@ -928,7 +939,9 @@ export default function HomeScreen() {
               String(entry.content);
 
             return (
-              <View key={entry.id} style={styles.timelineItem}>
+              <React.Fragment key={entry.id}>
+                {isNewDay ? <Text style={styles.timelineDayLabel}>{dayLabel}</Text> : null}
+              <View style={styles.timelineItem}>
                 <View style={styles.timelineDot} />
                 <View style={styles.timelineCard}>
                   <Text style={styles.timelineCategory}>{categoryLabel}</Text>
@@ -944,6 +957,7 @@ export default function HomeScreen() {
                   </Text>
                 </View>
               </View>
+              </React.Fragment>
             );
           })}
         </View>
@@ -1579,6 +1593,14 @@ const styles = StyleSheet.create({
   summaryText: { color: "#FFFFFF", fontSize: 18, lineHeight: 26, marginBottom: 12 },
   summaryLine: { color: "#A7ACB8", fontSize: 14, lineHeight: 22, marginTop: 4 },
 
+  timelineDayLabel: {
+    color: "#E8A33D",
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 1.4,
+    marginTop: 18,
+    marginBottom: 8,
+  },
   timeline: { marginTop: 8 },
   timelineItem: { flexDirection: "row", marginBottom: 12 },
   timelineDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#E8A33D", marginTop: 24, marginRight: 12 },
