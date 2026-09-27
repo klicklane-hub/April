@@ -49,6 +49,7 @@ export default function HomeScreen() {
   const [checkInSaveFailed, setCheckInSaveFailed] = useState(false);
   const [checkInVoiceError, setCheckInVoiceError] = useState(false);
   const [todayCheckIn, setTodayCheckIn] = useState<any>(null);
+  const [checkInContextNote, setCheckInContextNote] = useState("");
   const [healthEntries, setHealthEntries] = useState<any[]>([]);
   const [healthLoading, setHealthLoading] = useState(false);
   const [healthLoadError, setHealthLoadError] = useState(false);
@@ -734,7 +735,7 @@ export default function HomeScreen() {
     { key: "physicalConcerns", title: "Anything bothering you physically?", placeholder: "Tell me anything you’ve noticed, or say none." },
   ] as const;
 
-  const beginCheckIn = () => {
+  const beginCheckIn = (contextNote = "") => {
     if (Platform.OS === "web" && typeof window !== "undefined" && "speechSynthesis" in window) {
       window.speechSynthesis.cancel();
     }
@@ -751,12 +752,28 @@ export default function HomeScreen() {
     setAprilResponse("");
     talkContext.current = [];
     setTalkError(false);
-    setCheckInStep(0);
-    setCheckInAnswers({ overallFeeling: "", sleepHours: "", energyLevel: "", emotionalState: "", physicalConcerns: "" });
+    const trimmedContext = contextNote.trim();
+    const hasContext = Boolean(trimmedContext);
+    setCheckInStep(hasContext ? 1 : 0);
+    checkInStepRef.current = hasContext ? 1 : 0;
+    setCheckInContextNote(trimmedContext);
+    setCheckInAnswers({
+      overallFeeling: trimmedContext,
+      sleepHours: "",
+      energyLevel: "",
+      emotionalState: "",
+      physicalConcerns: "",
+    });
     setCheckInComplete(false);
     setCheckInMessage("");
     setCheckInVoiceError(false);
     setActiveTab("checkin");
+  };
+
+  const continueTalkIntoCheckIn = () => {
+    const note = transcript.trim();
+    if (!note || todayCheckIn) return;
+    beginCheckIn(note);
   };
 
   const reviewTodayCheckIn = () => {
@@ -779,6 +796,7 @@ export default function HomeScreen() {
     setAprilResponse("");
     setCheckInVoiceError(false);
     setCheckInMessage("");
+    setCheckInContextNote("");
     setCheckInAnswers({
       overallFeeling: todayCheckIn.overall_feeling ?? "",
       sleepHours: todayCheckIn.sleep_hours != null ? String(todayCheckIn.sleep_hours) : "",
@@ -972,6 +990,13 @@ export default function HomeScreen() {
           <Text style={styles.screenEyebrow}>DAILY CHECK-IN</Text>
           <View style={styles.progressRow}>{checkInQuestions.map((_, index) => <View key={index} style={[styles.progressDot, index <= checkInStep && styles.progressDotActive]} />)}</View>
           <Text style={styles.checkInStepText}>{checkInStep + 1} of {checkInQuestions.length}</Text>
+          {checkInContextNote && checkInStep === 1 ? (
+            <View style={styles.contextNoteCard}>
+              <Text style={styles.contextNoteLabel}>FROM YOUR TALK WITH APRIL</Text>
+              <Text style={styles.contextNoteText}>{checkInContextNote}</Text>
+              <Text style={styles.contextNoteHint}>I’ll keep this in mind so you don’t have to repeat it.</Text>
+            </View>
+          ) : null}
           <Text style={styles.checkInQuestion}>{question.title}</Text>
           <Text style={styles.checkInPrompt}>There’s no perfect answer. Just tell me what feels true right now.</Text>
           <Pressable
@@ -1160,6 +1185,11 @@ export default function HomeScreen() {
       ) : null}
       {(transcript.length > 0 || aprilResponse.length > 0) && !isListening ? (
         <>
+          {transcript.trim() && !todayCheckIn ? (
+            <Pressable style={styles.newConversationButton} onPress={continueTalkIntoCheckIn}>
+              <Text style={styles.newConversationText}>Use this in today’s check-in</Text>
+            </Pressable>
+          ) : null}
           <Pressable style={styles.newConversationButton} onPress={finishTalkSession}>
             <Text style={styles.newConversationText}>I’m done for now</Text>
           </Pressable>
@@ -1998,213 +2028,3 @@ const styles = StyleSheet.create({
     marginTop: 14,
     flexDirection: "row",
     alignItems: "center",
-  },
-
-  checkInLabel: { color: "#E8A33D", fontSize: 10, fontWeight: "800", letterSpacing: 1.5 },
-
-  checkInTitle: { color: "#FFFFFF", fontSize: 17, fontWeight: "600", marginTop: 7 },
-
-  checkInSubtitle: { color: "#A7ACB8", fontSize: 12, lineHeight: 18, marginTop: 5, paddingRight: 12 },
-
-  checkInArrow: { color: "#E8A33D", fontSize: 24 },
-
-  todayNoteCard: { backgroundColor: "#151A24", borderRadius: 18, padding: 18, marginBottom: 14, borderWidth: 1, borderColor: "#252C39" },
-
-  todayNoteText: { color: "#FFFFFF", fontSize: 16, lineHeight: 23, marginTop: 8 },
-
-  todayNoteMeta: { color: "#A7ACB8", fontSize: 13, lineHeight: 20, marginTop: 8 },
-  todayNoteTime: { color: "#777D89", fontSize: 11, marginTop: 10 },
-
-  insightHistoryMeta: { color: "#777D89", fontSize: 12, marginTop: -18, marginBottom: 18 },
-  insightCard: {
-    backgroundColor: "#151A24",
-    borderRadius: 20,
-    padding: 18,
-    marginTop: 14,
-    borderWidth: 1,
-    borderColor: "#252C39",
-  },
-
-  insightLabel: { color: "#B9A8D8", fontSize: 10, fontWeight: "800", letterSpacing: 1.5 },
-
-  insightText: { color: "#D9DCE3", fontSize: 14, lineHeight: 21, marginTop: 8 },
-
-  screenEyebrow: { color: "#777D89", fontSize: 11, fontWeight: "700", letterSpacing: 2, marginBottom: 8 },
-
-  screenTitle: { color: "#FFFFFF", fontSize: 28, fontWeight: "600", lineHeight: 34, marginBottom: 8 },
-
-  screenSubtitle: { color: "#A7ACB8", fontSize: 15, lineHeight: 23, marginBottom: 28 },
-
-  talkContent: {
-    flexGrow: 1,
-    alignItems: "center",
-    paddingHorizontal: 22,
-    paddingTop: 28,
-    paddingBottom: 110,
-  },
-
-  emptyCard: {
-    backgroundColor: "#151A24",
-    borderRadius: 20,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: "#252C39",
-  },
-
-  emptyTitle: { color: "#FFFFFF", fontSize: 18, fontWeight: "600", marginBottom: 8 },
-
-  emptyText: { color: "#A7ACB8", fontSize: 14, lineHeight: 22 },
-
-  secondaryButton: {
-    alignSelf: "flex-start",
-    backgroundColor: "#252C39",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 22,
-    marginTop: 18,
-  },
-
-  secondaryButtonText: { color: "#FFFFFF", fontSize: 13, fontWeight: "600" },
-
-  settingsCard: {
-    backgroundColor: "#151A24",
-    borderRadius: 18,
-    padding: 18,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: "#252C39",
-  },
-
-  settingLabel: { color: "#777D89", fontSize: 10, fontWeight: "800", letterSpacing: 1.5 },
-
-  settingValue: { color: "#FFFFFF", fontSize: 15, marginTop: 8 },
-
-  nameInput: {
-    marginTop: 12,
-    borderWidth: 1,
-    borderColor: "#2A2F3A",
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    color: "#F4F5F7",
-    fontSize: 15,
-  },
-  nameActions: {
-    flexDirection: "row",
-    gap: 10,
-    marginTop: 12,
-    alignItems: "center",
-  },
-  nameRow: {
-    marginTop: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  nameRowText: { flex: 1, paddingRight: 12 },
-  nameEdit: {
-    color: "#E8A33D",
-    fontSize: 13,
-    fontWeight: "700",
-  },
-  settingHint: { color: "#777D89", fontSize: 13, lineHeight: 19, marginTop: 7 },
-
-  newConversationButton: { marginTop: 12, paddingVertical: 12, paddingHorizontal: 16, alignItems: "center" },
-  newConversationText: { color: "#A7ACB8", fontSize: 13, fontWeight: "600" },
-  conversationButton: { marginTop: 18, minHeight: 56, borderRadius: 18, backgroundColor: "#E8A33D", alignItems: "center", justifyContent: "center" },
-  conversationButtonText: { color: "#0B0E14", fontSize: 16, fontWeight: "700" },
-  voiceAnswerButton: { marginTop: 14, minHeight: 52, borderRadius: 16, borderWidth: 1, borderColor: "#343C4B", backgroundColor: "#111620", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 9 },
-  voiceAnswerButtonActive: { borderColor: "#E8A33D", backgroundColor: "#171A20" },
-  voiceAnswerIcon: { color: "#E8A33D", fontSize: 14 },
-  voiceAnswerText: { color: "#D7DAE0", fontSize: 15, fontWeight: "600" },
-  checkInContent: { flexGrow: 1, paddingHorizontal: 22, paddingTop: 28, paddingBottom: 110 },
-  progressRow: { flexDirection: "row", gap: 6, marginTop: 8, marginBottom: 8 },
-  progressDot: { width: 28, height: 4, borderRadius: 2, backgroundColor: "#252C39" },
-  progressDotActive: { backgroundColor: "#E8A33D" },
-  checkInStepText: { color: "#777D89", fontSize: 12, marginBottom: 18 },
-  checkInQuestion: { color: "#FFFFFF", fontSize: 30, fontWeight: "600", lineHeight: 37, marginBottom: 10 },
-  checkInPrompt: { color: "#A7ACB8", fontSize: 15, lineHeight: 23, marginBottom: 24 },
-  checkInInput: { minHeight: 130, backgroundColor: "#151A24", borderWidth: 1, borderColor: "#252C39", borderRadius: 20, color: "#FFFFFF", fontSize: 17, lineHeight: 25, paddingHorizontal: 18, paddingVertical: 17, textAlignVertical: "top" },
-  checkInMessage: { color: "#E8A33D", fontSize: 13, lineHeight: 19, marginTop: 12 },
-  checkInActions: { flexDirection: "row", alignItems: "center", justifyContent: "flex-end", gap: 12, marginTop: 22 },
-  backButton: { paddingVertical: 15, paddingHorizontal: 16 },
-  backButtonText: { color: "#A7ACB8", fontSize: 15, fontWeight: "600" },
-  checkInRecorded: { color: "#777D89", fontSize: 12, marginTop: -14, marginBottom: 18 },
-  checkInSummaryCard: { backgroundColor: "#151A24", borderRadius: 20, padding: 20, borderWidth: 1, borderColor: "#252C39", marginBottom: 22 },
-  summaryLabel: { color: "#E8A33D", fontSize: 10, fontWeight: "800", letterSpacing: 1.5, marginBottom: 10 },
-  summaryText: { color: "#FFFFFF", fontSize: 18, lineHeight: 26, marginBottom: 12 },
-  summaryLine: { color: "#A7ACB8", fontSize: 14, lineHeight: 22, marginTop: 4 },
-
-  timelineDayLabel: {
-    color: "#E8A33D",
-    fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 1.4,
-    marginTop: 18,
-    marginBottom: 8,
-  },
-  filterRow: {
-    gap: 8,
-    paddingVertical: 4,
-    marginBottom: 4,
-  },
-  filterChip: {
-    borderWidth: 1,
-    borderColor: "#2A2F3A",
-    borderRadius: 18,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-  },
-  filterChipActive: {
-    borderColor: "#E8A33D",
-    backgroundColor: "#171A20",
-  },
-  filterChipText: {
-    color: "#9EA4B0",
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  filterChipTextActive: {
-    color: "#E8A33D",
-  },
-  timelineUpdated: { color: "#777D89", fontSize: 12, marginTop: -18, marginBottom: 4 },
-  timelineCoverage: { color: "#5F6672", fontSize: 11, marginBottom: 18 },
-  timeline: { marginTop: 8 },
-  timelineItem: { flexDirection: "row", marginBottom: 12 },
-  timelineDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#E8A33D", marginTop: 24, marginRight: 12 },
-  timelineCard: { flex: 1, backgroundColor: "#151A24", borderRadius: 18, padding: 16, borderWidth: 1, borderColor: "#252C39" },
-  timelineCategory: { color: "#E8A33D", fontSize: 9, fontWeight: "800", letterSpacing: 1.3, marginBottom: 6 },
-  timelineTitle: { color: "#FFFFFF", fontSize: 16, fontWeight: "600", marginBottom: 5 },
-  timelineText: { color: "#A7ACB8", fontSize: 14, lineHeight: 21 },
-  timelineDate: { color: "#777D89", fontSize: 11, marginTop: 10 },
-  tabBar: {
-    position: "absolute",
-    left: 12,
-    right: 12,
-    bottom: 10,
-    height: 72,
-    borderRadius: 24,
-    backgroundColor: "#151A24",
-    borderWidth: 1,
-    borderColor: "#252C39",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    paddingHorizontal: 4,
-  },
-
-  tab: { flex: 1, alignItems: "center", justifyContent: "center", gap: 5 },
-
-  tabMark: {
-    width: 5,
-    height: 5,
-    borderRadius: 3,
-    backgroundColor: "#4C5360",
-  },
-
-  tabMarkActive: { width: 18, backgroundColor: "#E8A33D" },
-
-  tabLabel: { color: "#777D89", fontSize: 10 },
-
-  tabLabelActive: { color: "#FFFFFF", fontWeight: "600" },
-});
