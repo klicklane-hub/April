@@ -700,14 +700,21 @@ export default function HomeScreen() {
       checkInAnswers.physicalConcerns.trim() && checkInAnswers.physicalConcerns.trim().toLowerCase() !== "none" ? { category: "symptom", title: "Physical concern", content: checkInAnswers.physicalConcerns.trim() } : null,
     ].filter(Boolean) as any[];
 
+    let entriesSaveFailed = false;
     if (entries.length) {
       const { error: entriesError } = await supabase.from("health_entries").insert(
         entries.map((entry) => ({ ...entry, user_id: sessionUser.id, source: "check_in" }))
       );
-      if (entriesError) console.log("APRIL health entry save error:", entriesError.message);
+      if (entriesError) {
+        console.log("APRIL health entry save error:", entriesError.message);
+        entriesSaveFailed = true;
+      }
     }
     setCheckInComplete(true);
     setCheckInSaving(false);
+    if (entriesSaveFailed) {
+      setCheckInMessage("Your check-in was saved, but I couldn’t add all of its details to your health story. You can try another check-in later.");
+    }
     await loadHealthData();
   };
 
