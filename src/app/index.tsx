@@ -210,8 +210,8 @@ export default function HomeScreen() {
           setCheckInAnswers((current) => ({ ...current, [key]: spoken }));
           setCheckInMessage("I heard you. Let me think about that…");
           const reply = await askApril(spoken, [
-            { role: "user", content: spoken },
             { role: "assistant", content: checkInQuestions[checkInStepRef.current]?.title ?? "" },
+            { role: "user", content: spoken },
           ]);
           setCheckInMessage(reply);
           speakAprilResponse(reply);
