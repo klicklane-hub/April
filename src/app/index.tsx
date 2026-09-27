@@ -1374,13 +1374,15 @@ export default function HomeScreen() {
           APRIL only shows observations from information you’ve chosen to record.
         </Text>
         {recordedDays.length > 0 ? (
-          <Text style={styles.insightHistoryMeta}>
-            Based on {recordedDays.length} recorded {recordedDays.length === 1 ? "day" : "days"} in your recent history.
-            {latestRecordedLabel ? ` Last recorded ${latestRecordedLabel}.` : ""}
-          </Text>
-          <Text style={styles.timelineCoverage}>
-            Insights use the 30 most recent recorded entries available to APRIL.
-          </Text>
+          <View>
+            <Text style={styles.insightHistoryMeta}>
+              Based on {recordedDays.length} recorded {recordedDays.length === 1 ? "day" : "days"} in your recent history.
+              {latestRecordedLabel ? ` Last recorded ${latestRecordedLabel}.` : ""}
+            </Text>
+            <Text style={styles.timelineCoverage}>
+              Insights use the 30 most recent recorded entries available to APRIL.
+            </Text>
+          </View>
         ) : null}
 
         {!hasEnoughHistory ? (
