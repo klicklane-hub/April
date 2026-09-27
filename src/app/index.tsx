@@ -436,6 +436,7 @@ export default function HomeScreen() {
       talkContext.current = [];
       setTranscript("");
       setAprilResponse("");
+      setTalkStatus("idle");
     }
     setActiveTab(tab);
   };
