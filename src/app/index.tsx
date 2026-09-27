@@ -900,6 +900,14 @@ export default function HomeScreen() {
           {todayCheckIn.overall_feeling ? <Text style={styles.todayNoteText}>{todayCheckIn.overall_feeling}</Text> : null}
           {todayCheckIn.emotional_state ? <Text style={styles.todayNoteMeta}>Emotion · {todayCheckIn.emotional_state}</Text> : null}
           {todayCheckIn.physical_concerns ? <Text style={styles.todayNoteMeta}>Physical · {todayCheckIn.physical_concerns}</Text> : null}
+          {todayCheckIn.checked_in_at ? (
+            <Text style={styles.todayNoteTime}>
+              Recorded · {new Date(todayCheckIn.checked_in_at).toLocaleString(undefined, {
+                hour: "numeric",
+                minute: "2-digit",
+              })}
+            </Text>
+          ) : null}
         </View>
       ) : null}
 
@@ -1783,6 +1791,7 @@ const styles = StyleSheet.create({
   todayNoteText: { color: "#FFFFFF", fontSize: 16, lineHeight: 23, marginTop: 8 },
 
   todayNoteMeta: { color: "#A7ACB8", fontSize: 13, lineHeight: 20, marginTop: 8 },
+  todayNoteTime: { color: "#777D89", fontSize: 11, marginTop: 10 },
 
   insightHistoryMeta: { color: "#777D89", fontSize: 12, marginTop: -18, marginBottom: 18 },
   insightCard: {
