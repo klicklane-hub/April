@@ -518,6 +518,23 @@ export default function HomeScreen() {
     setTalkStatus("idle");
   };
 
+  const finishTalkSession = () => {
+    if (Platform.OS === "web" && typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+    if (isListening) {
+      suppressSpeechEnd.current = true;
+      ExpoSpeechRecognitionModule.stop();
+    }
+    talkFlowActive.current = false;
+    checkInVoiceActive.current = false;
+    latestTranscript.current = "";
+    setIsListening(false);
+    setTalkStatus("idle");
+    setTalkError(false);
+    setActiveTab("home");
+  };
+
   const handleTabChange = (tab: typeof activeTab) => {
     if (Platform.OS === "web" && typeof window !== "undefined" && "speechSynthesis" in window) {
       window.speechSynthesis.cancel();
@@ -1142,9 +1159,14 @@ export default function HomeScreen() {
         </Pressable>
       ) : null}
       {(transcript.length > 0 || aprilResponse.length > 0) && !isListening ? (
-        <Pressable style={styles.newConversationButton} onPress={resetTalkConversation}>
-          <Text style={styles.newConversationText}>Start a new conversation</Text>
-        </Pressable>
+        <>
+          <Pressable style={styles.newConversationButton} onPress={finishTalkSession}>
+            <Text style={styles.newConversationText}>I’m done for now</Text>
+          </Pressable>
+          <Pressable style={styles.newConversationButton} onPress={resetTalkConversation}>
+            <Text style={styles.newConversationText}>Start a new conversation</Text>
+          </Pressable>
+        </>
       ) : null}
     </ScrollView>
   );
