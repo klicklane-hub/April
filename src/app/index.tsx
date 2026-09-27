@@ -937,9 +937,31 @@ export default function HomeScreen() {
               </Pressable>
             ))}
           </ScrollView>
-          <View style={styles.timeline}>
-          {healthEntries.filter((entry) => healthFilter === "all" || String(entry.category).toLowerCase() === healthFilter).map((entry, index, filteredEntries) => {
-            const category = String(entry.category).toLowerCase();
+          {(() => {
+            const filteredEntries = healthEntries.filter(
+              (entry) => healthFilter === "all" || String(entry.category).toLowerCase() === healthFilter
+            );
+            if (filteredEntries.length === 0) {
+              const filterLabel = healthFilter === "sleep" ? "sleep" :
+                healthFilter === "energy" ? "energy" :
+                healthFilter === "mood" ? "emotional" :
+                healthFilter === "symptom" ? "physical" : "health";
+              return (
+                <View style={styles.emptyCard}>
+                  <Text style={styles.emptyTitle}>No {filterLabel} entries yet.</Text>
+                  <Text style={styles.emptyText}>
+                    APRIL will show them here when you choose to record them.
+                  </Text>
+                  <Pressable style={styles.secondaryButton} onPress={beginCheckIn}>
+                    <Text style={styles.secondaryButtonText}>Add a check-in</Text>
+                  </Pressable>
+                </View>
+              );
+            }
+            return (
+              <View style={styles.timeline}>
+              {filteredEntries.map((entry, index) => {
+                const category = String(entry.category).toLowerCase();
             const entryDate = new Date(entry.occurred_at || entry.created_at);
             const previousEntry = filteredEntries[index - 1];
             const previousDate = previousEntry ? new Date(previousEntry.occurred_at || previousEntry.created_at) : null;
@@ -982,8 +1004,10 @@ export default function HomeScreen() {
               </View>
               </React.Fragment>
             );
-          })}
-          </View>
+              })}
+              </View>
+            );
+          })()}
         </>
       )}
     </ScrollView>
