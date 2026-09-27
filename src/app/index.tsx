@@ -942,6 +942,19 @@ export default function HomeScreen() {
       .filter((value) => Number.isFinite(value) && value >= 0 && value <= 10);
     const average = (values: number[]) =>
       values.length ? (values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(1) : null;
+    const numericAverage = (values: number[]) =>
+      values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : null;
+    const recentEntries = healthEntries.slice(0, 3);
+    const recentEnergy = recentEntries.filter((entry) => entry.category === "energy").map((entry) => Number(entry.content)).filter((v) => Number.isFinite(v) && v >= 0 && v <= 10);
+    const earlierEnergy = healthEntries.slice(3).filter((entry) => entry.category === "energy").map((entry) => Number(entry.content)).filter((v) => Number.isFinite(v) && v >= 0 && v <= 10);
+    const recentSleep = recentEntries.filter((entry) => entry.category === "sleep").map((entry) => Number(entry.content)).filter((v) => Number.isFinite(v) && v > 0 && v <= 24);
+    const earlierSleep = healthEntries.slice(3).filter((entry) => entry.category === "sleep").map((entry) => Number(entry.content)).filter((v) => Number.isFinite(v) && v > 0 && v <= 24);
+    const describeChange = (recent: number | null, earlier: number | null, unit: string) => {
+      if (recent === null || earlier === null || Math.abs(recent - earlier) < 0.5) return null;
+      return `Your recorded ${unit} has been ${recent > earlier ? "higher" : "lower"} in your most recent entries (${recent.toFixed(1)} vs ${earlier.toFixed(1)} earlier).`;
+    };
+    const energyChangeNote = describeChange(numericAverage(recentEnergy), numericAverage(earlierEnergy), "energy");
+    const sleepChangeNote = describeChange(numericAverage(recentSleep), numericAverage(earlierSleep), "sleep");
     const averageSleep = average(sleepValues);
     const averageEnergy = average(energyValues);
     const latestMood = healthEntries.find((entry) => entry.category === "mood");
@@ -988,6 +1001,15 @@ export default function HomeScreen() {
                 </Text>
               </View>
             ) : null}
+
+            {(energyChangeNote || sleepChangeNote) && (
+              <View style={styles.insightCard}>
+                <Text style={styles.insightLabel}>RECENT CHANGE</Text>
+                {energyChangeNote && <Text style={styles.insightText}>{energyChangeNote}</Text>}
+                {sleepChangeNote && <Text style={[styles.insightText, energyChangeNote ? { marginTop: 8 } : null]}>{sleepChangeNote}</Text>}
+                <Text style={styles.insightHint}>This compares your recent recorded entries with earlier entries.</Text>
+              </View>
+            )}
 
             <View style={styles.insightCard}>
               <Text style={styles.insightLabel}>ABOUT THESE INSIGHTS</Text>
