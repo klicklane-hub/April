@@ -759,10 +759,29 @@ export default function HomeScreen() {
 
   const nextCheckInStep = async () => {
     const key = checkInQuestions[checkInStep].key;
-    if (!checkInAnswers[key].trim()) {
+    const value = checkInAnswers[key].trim();
+
+    if (!value) {
       setCheckInMessage("Take your time — an answer helps me understand your day.");
       return;
     }
+
+    if (key === "sleepHours") {
+      const match = value.match(/^\s*(\d+(?:\.\d+)?)\s*(?:hours?|hrs?)?\s*$/i);
+      if (!match || Number(match[1]) > 24) {
+        setCheckInMessage("Please enter your sleep in hours, up to 24.");
+        return;
+      }
+    }
+
+    if (key === "energyLevel") {
+      const match = value.match(/^\s*(\d+(?:\.\d+)?)\s*(?:\/\s*10|out of 10)?\s*$/i);
+      if (!match || Number(match[1]) > 10) {
+        setCheckInMessage("Please enter your energy from 0 to 10.");
+        return;
+      }
+    }
+
     setCheckInMessage("");
     if (checkInStep < checkInQuestions.length - 1) setCheckInStep((step) => step + 1);
     else await saveCheckIn();
