@@ -802,7 +802,8 @@ export default function HomeScreen() {
             {checkInAnswers.emotionalState ? <Text style={styles.summaryLine}>Emotion · {checkInAnswers.emotionalState}</Text> : null}
             {checkInAnswers.physicalConcerns ? <Text style={styles.summaryLine}>Physical · {checkInAnswers.physicalConcerns}</Text> : null}
           </View>
-          <Pressable style={styles.button} onPress={() => handleTabChange("home")}><Text style={styles.buttonText}>{todayCheckIn ? "Back to today" : "Back to today"}</Text></Pressable>
+          <Pressable style={styles.button} onPress={() => handleTabChange("home")}><Text style={styles.buttonText}>Back to today</Text></Pressable>
+          <Pressable style={styles.secondaryButton} onPress={beginCheckIn}><Text style={styles.secondaryButtonText}>Start another check-in</Text></Pressable>
           <Pressable style={styles.secondaryButton} onPress={() => handleTabChange("health")}><Text style={styles.secondaryButtonText}>View my health story</Text></Pressable>
         </ScrollView>
       );
