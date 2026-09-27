@@ -145,6 +145,8 @@ export default function HomeScreen() {
     if (checkInError) {
       console.log("APRIL today check-in load error:", checkInError.message);
       setTodayCheckInLoadError(true);
+    } else {
+      setTodayCheckIn(checkIn ?? null);
     }
     const { data: entries, error: entriesError } = await supabase
       .from("health_entries")
@@ -158,7 +160,6 @@ export default function HomeScreen() {
       setHealthLoading(false);
       return;
     }
-    setTodayCheckIn(checkIn ?? null);
     setHealthEntries(entries ?? []);
     setHealthLoading(false);
   };
