@@ -872,21 +872,75 @@ export default function HomeScreen() {
     </ScrollView>
   );
 
-  const renderInsights = () => (
-    <ScrollView contentContainerStyle={styles.dashboardContent}>
-      <Text style={styles.screenEyebrow}>INSIGHTS</Text>
-      <Text style={styles.screenTitle}>Patterns, not diagnoses.</Text>
-      <Text style={styles.screenSubtitle}>
-        APRIL will only show observations based on information you’ve recorded.
-      </Text>
-      <View style={styles.emptyCard}>
-        <Text style={styles.emptyTitle}>Your baseline is just beginning.</Text>
-        <Text style={styles.emptyText}>
-          After you’ve shared enough information, APRIL can help you notice changes in sleep, energy, mood and other areas you choose to track.
+  const renderInsights = () => {
+    const sleepValues = healthEntries
+      .filter((entry) => entry.category === "sleep")
+      .map((entry) => Number(entry.content))
+      .filter((value) => Number.isFinite(value) && value > 0 && value <= 24);
+    const energyValues = healthEntries
+      .filter((entry) => entry.category === "energy")
+      .map((entry) => Number(entry.content))
+      .filter((value) => Number.isFinite(value) && value >= 0 && value <= 10);
+    const average = (values: number[]) =>
+      values.length ? (values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(1) : null;
+    const averageSleep = average(sleepValues);
+    const averageEnergy = average(energyValues);
+    const latestMood = healthEntries.find((entry) => entry.category === "mood");
+    const hasEnoughHistory = sleepValues.length + energyValues.length >= 2 || healthEntries.length >= 3;
+
+    return (
+      <ScrollView contentContainerStyle={styles.dashboardContent}>
+        <Text style={styles.screenEyebrow}>INSIGHTS</Text>
+        <Text style={styles.screenTitle}>Patterns, not diagnoses.</Text>
+        <Text style={styles.screenSubtitle}>
+          APRIL only shows observations from information you’ve chosen to record.
         </Text>
-      </View>
-    </ScrollView>
-  );
+
+        {!hasEnoughHistory ? (
+          <View style={styles.emptyCard}>
+            <Text style={styles.emptyTitle}>Your baseline is just beginning.</Text>
+            <Text style={styles.emptyText}>
+              Keep checking in over the next few days. Once there is enough of your own history, APRIL can highlight simple changes and patterns without diagnosing you.
+            </Text>
+            <Pressable style={styles.secondaryButton} onPress={beginCheckIn}>
+              <Text style={styles.secondaryButtonText}>Add today’s check-in</Text>
+            </Pressable>
+          </View>
+        ) : (
+          <>
+            <View style={styles.snapshotRow}>
+              <View style={styles.snapshotCard}>
+                <Text style={styles.snapshotIcon}>◷</Text>
+                <Text style={styles.snapshotTitle}>Average sleep</Text>
+                <Text style={styles.snapshotValue}>{averageSleep ? `${averageSleep} hours` : "Not enough data"}</Text>
+              </View>
+              <View style={styles.snapshotCard}>
+                <Text style={styles.snapshotIcon}>✦</Text>
+                <Text style={styles.snapshotTitle}>Average energy</Text>
+                <Text style={styles.snapshotValue}>{averageEnergy ? `${averageEnergy}/10` : "Not enough data"}</Text>
+              </View>
+            </View>
+
+            {latestMood ? (
+              <View style={styles.insightCard}>
+                <Text style={styles.insightLabel}>RECENTLY RECORDED</Text>
+                <Text style={styles.insightText}>
+                  You most recently recorded your emotional state as “{latestMood.content}”.
+                </Text>
+              </View>
+            ) : null}
+
+            <View style={styles.insightCard}>
+              <Text style={styles.insightLabel}>ABOUT THESE INSIGHTS</Text>
+              <Text style={styles.insightText}>
+                These are summaries of what you recorded, not medical conclusions. If something concerns you, APRIL can help you organize what you’ve noticed to discuss with a healthcare professional.
+              </Text>
+            </View>
+          </>
+        )}
+      </ScrollView>
+    );
+  };
 
   const renderMe = () => (
     <ScrollView contentContainerStyle={styles.dashboardContent}>
