@@ -47,6 +47,7 @@ export default function HomeScreen() {
   const [checkInComplete, setCheckInComplete] = useState(false);
   const [checkInMessage, setCheckInMessage] = useState("");
   const [checkInSaveFailed, setCheckInSaveFailed] = useState(false);
+  const [checkInVoiceError, setCheckInVoiceError] = useState(false);
   const [todayCheckIn, setTodayCheckIn] = useState<any>(null);
   const [healthEntries, setHealthEntries] = useState<any[]>([]);
   const [healthLoading, setHealthLoading] = useState(false);
@@ -277,6 +278,7 @@ export default function HomeScreen() {
     setIsListening(false);
     if (checkInVoiceActive.current) {
       checkInVoiceActive.current = false;
+      setCheckInVoiceError(true);
       setCheckInMessage("I couldn’t hear that clearly. You can try again or type your answer.");
     } else {
       setTalkStatus("idle");
@@ -797,6 +799,7 @@ export default function HomeScreen() {
     checkInVoiceActive.current = true;
     latestTranscript.current = "";
     setTranscript("");
+    setCheckInVoiceError(false);
     setCheckInMessage("Listening…");
     ExpoSpeechRecognitionModule.start({
       lang: "en-US",
