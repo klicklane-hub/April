@@ -1147,6 +1147,21 @@ export default function HomeScreen() {
     const averageSleep = average(sleepValues);
     const averageEnergy = average(energyValues);
     const latestMood = healthEntries.find((entry) => entry.category === "mood");
+    const latestRecordedValue = healthEntries
+      .map((entry) => entry.occurred_at ?? entry.created_at)
+      .filter(Boolean)
+      .map((value) => new Date(value))
+      .filter((date) => !Number.isNaN(date.getTime()))
+      .sort((a, b) => b.getTime() - a.getTime())[0];
+    const latestRecordedLabel = latestRecordedValue
+      ? latestRecordedValue.toLocaleString(undefined, {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+        })
+      : null;
     const hasEnoughHistory = recordedDays.length >= 2;
     const hasSleepData = sleepValues.length > 0;
     const hasEnergyData = energyValues.length > 0;
@@ -1165,6 +1180,7 @@ export default function HomeScreen() {
         {recordedDays.length > 0 ? (
           <Text style={styles.insightHistoryMeta}>
             Based on {recordedDays.length} recorded {recordedDays.length === 1 ? "day" : "days"} in your recent history.
+            {latestRecordedLabel ? ` Last recorded ${latestRecordedLabel}.` : ""}
           </Text>
         ) : null}
 
