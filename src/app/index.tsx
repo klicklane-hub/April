@@ -991,7 +991,7 @@ export default function HomeScreen() {
       </Text>
       {!healthLoading && healthEntries.length > 0 ? (
         <Text style={styles.timelineUpdated}>
-          Last recorded · {new Date(healthEntries[0].occurred_at || healthEntries[0].created_at).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}
+          Last recorded · {new Date(healthEntries[0].occurred_at || healthEntries[0].created_at).toLocaleString(undefined, { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" })}
         </Text>
       ) : null}
       {healthLoading ? (
@@ -1081,11 +1081,13 @@ export default function HomeScreen() {
                   <Text style={styles.timelineTitle}>{entry.title}</Text>
                   <Text style={styles.timelineText}>{displayContent}</Text>
                   <Text style={styles.timelineDate}>
-                    {new Date(entry.occurred_at || entry.created_at).toLocaleDateString(undefined, {
+                    {new Date(entry.occurred_at || entry.created_at).toLocaleString(undefined, {
                       weekday: "short",
                       day: "numeric",
                       month: "short",
                       year: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
                     })}
                   </Text>
                 </View>
