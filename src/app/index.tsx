@@ -48,6 +48,7 @@ export default function HomeScreen() {
   const [todayCheckIn, setTodayCheckIn] = useState<any>(null);
   const [healthEntries, setHealthEntries] = useState<any[]>([]);
   const [healthLoading, setHealthLoading] = useState(false);
+  const [healthFilter, setHealthFilter] = useState<"all" | "sleep" | "energy" | "mood" | "symptom">("all");
 
   const pulse = useRef(new Animated.Value(1)).current;
   const latestTranscript = useRef("");
@@ -915,11 +916,29 @@ export default function HomeScreen() {
           </Pressable>
         </View>
       ) : (
-        <View style={styles.timeline}>
-          {healthEntries.map((entry, index) => {
+        <>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
+            {([
+              ["all", "All"],
+              ["sleep", "Sleep"],
+              ["energy", "Energy"],
+              ["mood", "Emotional"],
+              ["symptom", "Physical"],
+            ] as const).map(([key, label]) => (
+              <Pressable
+                key={key}
+                style={[styles.filterChip, healthFilter === key && styles.filterChipActive]}
+                onPress={() => setHealthFilter(key)}
+              >
+                <Text style={[styles.filterChipText, healthFilter === key && styles.filterChipTextActive]}>{label}</Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+          <View style={styles.timeline}>
+          {healthEntries.filter((entry) => healthFilter === "all" || String(entry.category).toLowerCase() === healthFilter).map((entry, index, filteredEntries) => {
             const category = String(entry.category).toLowerCase();
             const entryDate = new Date(entry.occurred_at || entry.created_at);
-            const previousEntry = healthEntries[index - 1];
+            const previousEntry = filteredEntries[index - 1];
             const previousDate = previousEntry ? new Date(previousEntry.occurred_at || previousEntry.created_at) : null;
             const isNewDay = !previousDate || entryDate.toDateString() !== previousDate.toDateString();
             const today = new Date();
@@ -961,7 +980,8 @@ export default function HomeScreen() {
               </React.Fragment>
             );
           })}
-        </View>
+          </View>
+        </>
       )}
     </ScrollView>
   );
@@ -1601,6 +1621,30 @@ const styles = StyleSheet.create({
     letterSpacing: 1.4,
     marginTop: 18,
     marginBottom: 8,
+  },
+  filterRow: {
+    gap: 8,
+    paddingVertical: 4,
+    marginBottom: 4,
+  },
+  filterChip: {
+    borderWidth: 1,
+    borderColor: "#2A2F3A",
+    borderRadius: 18,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  filterChipActive: {
+    borderColor: "#E8A33D",
+    backgroundColor: "#171A20",
+  },
+  filterChipText: {
+    color: "#9EA4B0",
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  filterChipTextActive: {
+    color: "#E8A33D",
   },
   timeline: { marginTop: 8 },
   timelineItem: { flexDirection: "row", marginBottom: 12 },
