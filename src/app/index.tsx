@@ -323,6 +323,22 @@ export default function HomeScreen() {
       console.log("APRIL conversation error:", error.message);
       return "I’m here with you. I can still record what you share.";
     }
+
+    if (data?.diagnostic) {
+      console.log("APRIL conversation diagnostic:", data.diagnostic);
+      const messages: Record<string, string> = {
+        OPENAI_API_KEY_MISSING: "My conversation service still needs its OpenAI connection.",
+        OPENAI_API_KEY_REJECTED: "My conversation service is rejecting its OpenAI connection.",
+        OPENAI_ACCESS_DENIED: "My conversation service does not currently have access to the OpenAI model.",
+        OPENAI_MODEL_OR_ENDPOINT_NOT_FOUND: "My conversation service cannot reach the selected AI model.",
+        OPENAI_QUOTA_OR_RATE_LIMIT: "My conversation service has reached its OpenAI usage limit.",
+        OPENAI_PROVIDER_ERROR: "The OpenAI conversation service is temporarily unavailable.",
+        OPENAI_REQUEST_REJECTED: "The OpenAI conversation request was rejected.",
+        APRIL_FUNCTION_ERROR: "Something interrupted APRIL’s conversation service.",
+      };
+      return messages[data.diagnostic] ?? "My conversation service needs attention.";
+    }
+
     return data?.reply ?? "I’m listening. Tell me a little more.";
   };
 
