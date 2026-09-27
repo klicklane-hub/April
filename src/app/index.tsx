@@ -996,11 +996,19 @@ export default function HomeScreen() {
       <View style={styles.settingsCard}>
         <Text style={styles.settingLabel}>COMPANION</Text>
         <Text style={styles.settingValue}>Calm voice · English</Text>
+        <Text style={styles.settingHint}>Warm, concise conversations focused on your wellbeing.</Text>
       </View>
 
       <View style={styles.settingsCard}>
-        <Text style={styles.settingLabel}>PRIVACY</Text>
+        <Text style={styles.settingLabel}>YOUR DATA</Text>
         <Text style={styles.settingValue}>Your health information belongs to you.</Text>
+        <Text style={styles.settingHint}>Only information you choose to record is added to your health story.</Text>
+      </View>
+
+      <View style={styles.settingsCard}>
+        <Text style={styles.settingLabel}>HEALTH SAFETY</Text>
+        <Text style={styles.settingValue}>Patterns, not diagnoses.</Text>
+        <Text style={styles.settingHint}>APRIL helps you notice changes and organize what you experience. It does not replace a healthcare professional.</Text>
       </View>
 
       <Pressable style={styles.signOutButton} onPress={() => supabase.auth.signOut()}>
@@ -1476,6 +1484,8 @@ const styles = StyleSheet.create({
   settingLabel: { color: "#777D89", fontSize: 10, fontWeight: "800", letterSpacing: 1.5 },
 
   settingValue: { color: "#FFFFFF", fontSize: 15, marginTop: 8 },
+
+  settingHint: { color: "#777D89", fontSize: 13, lineHeight: 19, marginTop: 7 },
 
   conversationButton: { marginTop: 18, minHeight: 56, borderRadius: 18, backgroundColor: "#E8A33D", alignItems: "center", justifyContent: "center" },
   conversationButtonText: { color: "#0B0E14", fontSize: 16, fontWeight: "700" },
