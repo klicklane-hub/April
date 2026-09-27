@@ -990,9 +990,14 @@ export default function HomeScreen() {
         Things you choose to record will appear here in chronological order.
       </Text>
       {!healthLoading && healthEntries.length > 0 ? (
-        <Text style={styles.timelineUpdated}>
-          Last recorded · {new Date(healthEntries[0].occurred_at || healthEntries[0].created_at).toLocaleString(undefined, { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" })}
-        </Text>
+        <>
+          <Text style={styles.timelineUpdated}>
+            Last recorded · {new Date(healthEntries[0].occurred_at || healthEntries[0].created_at).toLocaleString(undefined, { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" })}
+          </Text>
+          <Text style={styles.timelineCoverage}>
+            Showing your 30 most recent recorded entries.
+          </Text>
+        </>
       ) : null}
       {healthLoading ? (
         <View style={styles.emptyCard}><ActivityIndicator color="#E8A33D" /><Text style={styles.emptyText}>Loading your health story…</Text></View>
@@ -1931,7 +1936,8 @@ const styles = StyleSheet.create({
   filterChipTextActive: {
     color: "#E8A33D",
   },
-  timelineUpdated: { color: "#777D89", fontSize: 12, marginTop: -18, marginBottom: 18 },
+  timelineUpdated: { color: "#777D89", fontSize: 12, marginTop: -18, marginBottom: 4 },
+  timelineCoverage: { color: "#5F6672", fontSize: 11, marginBottom: 18 },
   timeline: { marginTop: 8 },
   timelineItem: { flexDirection: "row", marginBottom: 12 },
   timelineDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#E8A33D", marginTop: 24, marginRight: 12 },
