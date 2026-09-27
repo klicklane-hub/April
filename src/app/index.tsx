@@ -1164,7 +1164,7 @@ export default function HomeScreen() {
         </Text>
         {recordedDays.length > 0 ? (
           <Text style={styles.insightHistoryMeta}>
-            Based on {recordedDays.length} recorded {recordedDays.length === 1 ? "day" : "days"}.
+            Based on {recordedDays.length} recorded {recordedDays.length === 1 ? "day" : "days"} in your recent history.
           </Text>
         ) : null}
 
