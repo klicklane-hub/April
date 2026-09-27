@@ -686,6 +686,7 @@ export default function HomeScreen() {
     setCheckInAnswers({ overallFeeling: "", sleepHours: "", energyLevel: "", emotionalState: "", physicalConcerns: "" });
     setCheckInComplete(false);
     setCheckInMessage("");
+    setCheckInVoiceError(false);
     setActiveTab("checkin");
   };
 
@@ -893,6 +894,11 @@ export default function HomeScreen() {
           </Pressable>
           <TextInput style={styles.checkInInput} placeholder={question.placeholder} placeholderTextColor="#777D89" value={value} onChangeText={updateCheckInAnswer} multiline={question.key !== "sleepHours" && question.key !== "energyLevel"} keyboardType={question.key === "sleepHours" || question.key === "energyLevel" ? "decimal-pad" : "default"} />
           {checkInMessage ? <Text style={styles.checkInMessage}>{checkInMessage}</Text> : null}
+          {checkInVoiceError && !isListening ? (
+            <Pressable style={styles.newConversationButton} onPress={startCheckInVoice} disabled={checkInSaving}>
+              <Text style={styles.newConversationText}>Try again</Text>
+            </Pressable>
+          ) : null}
           <View style={styles.checkInActions}>
             {checkInStep > 0 ? <Pressable style={styles.backButton} onPress={() => { setCheckInMessage(""); setCheckInStep((step) => step - 1); }}><Text style={styles.backButtonText}>Back</Text></Pressable> : null}
             <Pressable style={[styles.button, checkInSaving && styles.buttonDisabled]} onPress={nextCheckInStep} disabled={checkInSaving}>
