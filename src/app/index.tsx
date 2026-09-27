@@ -1180,11 +1180,17 @@ export default function HomeScreen() {
                 <Text style={styles.snapshotIcon}>◷</Text>
                 <Text style={styles.snapshotTitle}>Average sleep</Text>
                 <Text style={styles.snapshotValue}>{averageSleep !== null ? `${averageSleep} hours` : "Not recorded yet"}</Text>
+                {averageSleep !== null ? (
+                  <Text style={styles.snapshotMeta}>{sleepValues.length} recorded {sleepValues.length === 1 ? "entry" : "entries"}</Text>
+                ) : null}
               </View>
               <View style={styles.snapshotCard}>
                 <Text style={styles.snapshotIcon}>✦</Text>
                 <Text style={styles.snapshotTitle}>Average energy</Text>
                 <Text style={styles.snapshotValue}>{averageEnergy !== null ? `${averageEnergy}/10` : "Not recorded yet"}</Text>
+                {averageEnergy !== null ? (
+                  <Text style={styles.snapshotMeta}>{energyValues.length} recorded {energyValues.length === 1 ? "entry" : "entries"}</Text>
+                ) : null}
               </View>
             </View>
 
@@ -1706,6 +1712,7 @@ const styles = StyleSheet.create({
   snapshotTitle: { color: "#FFFFFF", fontSize: 14, fontWeight: "600" },
 
   snapshotValue: { color: "#777D89", fontSize: 12, marginTop: 8 },
+  snapshotMeta: { color: "#5F6672", fontSize: 10, marginTop: 5 },
 
   checkInCard: {
     backgroundColor: "#211F1A",
