@@ -703,6 +703,21 @@ export default function HomeScreen() {
   ] as const;
 
   const beginCheckIn = () => {
+    if (Platform.OS === "web" && typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+    if (isListening) {
+      suppressSpeechEnd.current = true;
+      ExpoSpeechRecognitionModule.stop();
+    }
+    checkInVoiceActive.current = false;
+    latestTranscript.current = "";
+    setIsListening(false);
+    setTalkStatus("idle");
+    setTranscript("");
+    setAprilResponse("");
+    talkContext.current = [];
+    setTalkError(false);
     setCheckInStep(0);
     setCheckInAnswers({ overallFeeling: "", sleepHours: "", energyLevel: "", emotionalState: "", physicalConcerns: "" });
     setCheckInComplete(false);
