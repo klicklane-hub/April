@@ -1128,6 +1128,11 @@ export default function HomeScreen() {
         <Text style={styles.screenSubtitle}>
           APRIL only shows observations from information you’ve chosen to record.
         </Text>
+        {recordedDays.length > 0 ? (
+          <Text style={styles.insightHistoryMeta}>
+            Based on {recordedDays.length} recorded {recordedDays.length === 1 ? "day" : "days"}.
+          </Text>
+        ) : null}
 
         {!hasEnoughHistory ? (
           <View style={styles.emptyCard}>
@@ -1679,6 +1684,7 @@ const styles = StyleSheet.create({
 
   todayNoteMeta: { color: "#A7ACB8", fontSize: 13, lineHeight: 20, marginTop: 8 },
 
+  insightHistoryMeta: { color: "#777D89", fontSize: 12, marginTop: -18, marginBottom: 18 },
   insightCard: {
     backgroundColor: "#151A24",
     borderRadius: 20,
