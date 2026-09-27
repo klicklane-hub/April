@@ -55,6 +55,7 @@ export default function HomeScreen() {
 
   const pulse = useRef(new Animated.Value(1)).current;
   const latestTranscript = useRef("");
+  const talkContext = useRef<{ role: string; content: string }[]>([]);
   const checkInVoiceActive = useRef(false);
   const checkInStepRef = useRef(0);
 
@@ -241,7 +242,13 @@ export default function HomeScreen() {
 
     if (spoken) {
       setAprilResponse("Thinking…");
-      askApril(spoken, transcript ? [{ role: "user", content: transcript }] : []).then((reply) => {
+      const context = talkContext.current.slice(-6);
+      askApril(spoken, context).then((reply) => {
+        talkContext.current = [
+          ...talkContext.current,
+          { role: "user", content: spoken },
+          { role: "assistant", content: reply },
+        ].slice(-8);
         setAprilResponse(reply);
         speakAprilResponse(reply);
       });
@@ -418,6 +425,11 @@ export default function HomeScreen() {
     }
     checkInVoiceActive.current = false;
     setIsListening(false);
+    if (tab !== "talk") {
+      talkContext.current = [];
+      setTranscript("");
+      setAprilResponse("");
+    }
     setActiveTab(tab);
   };
 
