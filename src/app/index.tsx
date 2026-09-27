@@ -221,7 +221,7 @@ export default function HomeScreen() {
             const nextStep = currentStep + 1;
             setCheckInStep(nextStep);
             checkInStepRef.current = nextStep;
-            window.setTimeout(() => {
+            setTimeout(() => {
               setCheckInMessage("APRIL is asking…");
               speakCheckInQuestion(checkInQuestions[nextStep].title, () => {
                 startCheckInVoice();
@@ -229,7 +229,7 @@ export default function HomeScreen() {
             }, Platform.OS === "web" ? 700 : 0);
           } else {
             setCheckInMessage("That’s your check-in complete. Saving what you shared…");
-            window.setTimeout(() => {
+            setTimeout(() => {
               saveCheckIn();
             }, Platform.OS === "web" ? 700 : 0);
           }
@@ -258,6 +258,13 @@ export default function HomeScreen() {
   useSpeechRecognitionEvent("error", (event) => {
     console.log("Speech recognition error:", event.error);
     setIsListening(false);
+    if (checkInVoiceActive.current) {
+      checkInVoiceActive.current = false;
+      setCheckInMessage("I couldn’t hear that clearly. You can try again or type your answer.");
+    } else {
+      setTalkStatus("idle");
+      setAprilResponse("I couldn’t hear that clearly. Please try again.");
+    }
   });
 
   const handleAuth = async () => {
