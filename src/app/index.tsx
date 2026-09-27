@@ -1135,7 +1135,8 @@ export default function HomeScreen() {
     const earlierSleep = valuesForDays("sleep", earlierDays, 0.01, 24);
     const describeChange = (recent: number | null, earlier: number | null, unit: string) => {
       if (recent === null || earlier === null || Math.abs(recent - earlier) < 0.5) return null;
-      return `Your recorded ${unit} has been ${recent > earlier ? "higher" : "lower"} across your most recent recorded days (${recent.toFixed(1)} vs ${earlier.toFixed(1)} on earlier recorded days).`;
+      const earlierCount = earlierDays.size;
+      return `Your recorded ${unit} has been ${recent > earlier ? "higher" : "lower"} across your most recent recorded days (${recent.toFixed(1)} vs ${earlier.toFixed(1)} across the earlier ${earlierCount === 1 ? "day" : "days"}).`;
     };
     const energyChangeNote = describeChange(numericAverage(recentEnergy), numericAverage(earlierEnergy), "energy");
     const sleepChangeNote = describeChange(numericAverage(recentSleep), numericAverage(earlierSleep), "sleep");
