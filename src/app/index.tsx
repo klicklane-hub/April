@@ -26,6 +26,7 @@ export default function HomeScreen() {
   const [sessionUser, setSessionUser] = useState<any>(null);
   const [profileReady, setProfileReady] = useState(false);
   const [profileName, setProfileName] = useState("");
+  const [aprilAvatar, setAprilAvatar] = useState<"orb" | "warm" | "calm" | "bright" | "grounded">("orb");
   const [activeTab, setActiveTab] = useState<"home" | "talk" | "health" | "insights" | "me" | "checkin">("home");
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
 
@@ -103,7 +104,7 @@ export default function HomeScreen() {
     const loadProfile = async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, display_name, date_of_birth, preferred_language, voice_preference")
+        .select("id, display_name, date_of_birth, preferred_language, voice_preference, april_avatar")
         .eq("id", sessionUser.id)
         .maybeSingle();
 
@@ -117,6 +118,7 @@ export default function HomeScreen() {
       }
 
       setProfileName(data?.display_name ?? "");
+      setAprilAvatar(data?.april_avatar ?? "orb");
       setNeedsOnboarding(!data);
       setProfileReady(true);
     };
@@ -350,6 +352,7 @@ export default function HomeScreen() {
             display_name: displayName.trim(),
             preferred_language: "en",
             voice_preference: "calm",
+            april_avatar: "orb",
           });
 
           if (profileError) {
@@ -1008,15 +1011,7 @@ export default function HomeScreen() {
           <Text style={styles.screenEyebrow}>DAILY CHECK-IN</Text>
           <View style={styles.progressRow}>{checkInQuestions.map((_, index) => <View key={index} style={[styles.progressDot, index <= checkInStep && styles.progressDotActive]} />)}</View>
           <Text style={styles.checkInStepText}>{checkInStep + 1} of {checkInQuestions.length}</Text>
-          <View style={styles.checkInCompanion}>
-            <View style={styles.checkInPersonShoulders} />
-            <View style={styles.checkInPersonNeck} />
-            <View style={styles.checkInPersonHead}>
-              <View style={styles.checkInPersonHair} />
-              <View style={styles.checkInPersonEyeLeft} />
-              <View style={styles.checkInPersonEyeRight} />
-            </View>
-          </View>
+          <View style={styles.checkInCompanion}>{renderAprilCompanion("checkin")}</View>
           {checkInContextNote && checkInStep === 1 ? (
             <View style={styles.contextNoteCard}>
               <Text style={styles.contextNoteLabel}>FROM YOUR TALK WITH APRIL</Text>
@@ -1059,6 +1054,63 @@ export default function HomeScreen() {
     );
   };
 
+
+  const renderAprilCompanion = (mode: "hero" | "talk" | "small" | "checkin") => {
+    const scale = mode === "talk" ? 1.08 : mode === "hero" ? 0.92 : mode === "checkin" ? 0.66 : 0.42;
+    const palette = {
+      warm: { skin: "#D49B78", hair: "#171B24", shirt: "#B9A8D8", accent: "#E8A33D" },
+      calm: { skin: "#C88F78", hair: "#26313A", shirt: "#8ED6B1", accent: "#9DCBC1" },
+      bright: { skin: "#D8A07A", hair: "#3A2520", shirt: "#E8A33D", accent: "#F2C36B" },
+      grounded: { skin: "#8E6252", hair: "#17171A", shirt: "#667085", accent: "#B9A8D8" },
+    } as const;
+
+    if (aprilAvatar === "orb") {
+      if (mode === "talk") {
+        return (
+          <>
+            <View style={styles.talkPresenceHalo} />
+            <View style={styles.talkPresenceRibbonOne} />
+            <View style={styles.talkPresenceRibbonTwo} />
+            <View style={styles.talkPresenceRibbonThree} />
+            <View style={[styles.talkPresenceCore, isListening && styles.talkPresenceCoreListening]}>
+              <View style={styles.talkPresenceCoreLight} />
+            </View>
+            <View style={[styles.talkPresenceWave, isListening && styles.talkPresenceWaveActive]} />
+          </>
+        );
+      }
+      if (mode === "hero") {
+        return (
+          <View style={styles.aprilPresence}>
+            <View style={styles.presenceRibbonOuter} />
+            <View style={styles.presenceRibbonMid} />
+            <View style={styles.presenceRibbonInner} />
+            <View style={styles.presenceCore}><View style={styles.presenceCoreLight} /></View>
+          </View>
+        );
+      }
+      return (
+        <View style={[styles.avatarOrbMini, mode === "checkin" && styles.avatarOrbCheckin]}>
+          <View style={styles.avatarOrbCore} />
+        </View>
+      );
+    }
+
+    const p = palette[aprilAvatar];
+    return (
+      <View style={[styles.avatarFigure, { transform: [{ scale }] }]}>
+        <View style={[styles.avatarShoulders, { backgroundColor: p.shirt }]} />
+        <View style={[styles.avatarNeck, { backgroundColor: p.skin }]} />
+        <View style={[styles.avatarHead, { backgroundColor: p.skin }]}>
+          <View style={[styles.avatarHair, { backgroundColor: p.hair }]} />
+          <View style={[styles.avatarEye, { left: 25 }]} />
+          <View style={[styles.avatarEye, { right: 25 }]} />
+          <View style={[styles.avatarAccent, { backgroundColor: p.accent }]} />
+        </View>
+      </View>
+    );
+  };
+
   const renderHome = () => (
     <ScrollView contentContainerStyle={styles.dashboardContent}>
       <View style={styles.dashboardHeader}>
@@ -1070,16 +1122,7 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.aprilHero}>
-        <View style={styles.aprilPresence}>
-          <View style={styles.personShouldersHome} />
-          <View style={styles.personNeckHome} />
-          <View style={styles.personHeadHome}>
-            <View style={styles.personHairHome} />
-            <View style={styles.personEyeHomeLeft} />
-            <View style={styles.personEyeHomeRight} />
-            <View style={styles.personSmileHome} />
-          </View>
-        </View>
+        <View style={styles.aprilPresenceSlot}>{renderAprilCompanion("hero")}</View>
         <View style={styles.aprilHeroCopy}>
           <View style={styles.aprilNameRow}>
             <Text style={styles.homePresenceLabel}>APRIL</Text>
@@ -1096,15 +1139,7 @@ export default function HomeScreen() {
       </Text>
 
       <Pressable style={styles.talkCard} onPress={() => handleTabChange("talk")}>
-        <View style={styles.smallCompanion}>
-          <View style={styles.smallPersonShoulders} />
-          <View style={styles.smallPersonNeck} />
-          <View style={styles.smallPersonHead}>
-            <View style={styles.smallPersonHair} />
-            <View style={styles.smallPersonEyeLeft} />
-            <View style={styles.smallPersonEyeRight} />
-          </View>
-        </View>
+        <View style={styles.smallCompanion}>{renderAprilCompanion("small")}</View>
         <View style={styles.talkCardText}>
           <Text style={styles.talkCardTitle}>Talk to me</Text>
           <Text style={styles.talkCardSubtitle}>Tell me how you’re doing.</Text>
@@ -1191,16 +1226,7 @@ export default function HomeScreen() {
       </Text>
 
       <Animated.View style={[styles.talkBotStage, { transform: [{ scale: pulse }] }]}>
-        <View style={styles.talkPersonGlow} />
-        <View style={styles.talkPersonShoulders} />
-        <View style={styles.talkPersonNeck} />
-        <View style={[styles.talkPersonHead, isListening && styles.talkPersonHeadListening]}>
-          <View style={styles.talkPersonHair} />
-          <View style={styles.talkPersonEyeLeft} />
-          <View style={styles.talkPersonEyeRight} />
-          <View style={[styles.talkPersonMouth, isListening && styles.talkPersonMouthListening]} />
-        </View>
-        <View style={[styles.talkPresenceWave, isListening && styles.talkPresenceWaveActive]} />
+        {renderAprilCompanion("talk")}
       </Animated.View>
 
       {transcript.length > 0 && (
@@ -1649,6 +1675,40 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.settingsCard}>
+        <Text style={styles.settingLabel}>APRIL APPEARANCE</Text>
+        <Text style={styles.settingValue}>Choose your APRIL</Text>
+        <Text style={styles.settingHint}>Pick the presence that feels most comfortable to you. Your choice changes the visual companion, not how APRIL supports you.</Text>
+        <View style={styles.avatarPicker}>
+          {([
+            ["orb", "Orb"],
+            ["warm", "Warm"],
+            ["calm", "Calm"],
+            ["bright", "Bright"],
+            ["grounded", "Grounded"],
+          ] as const).map(([value, label]) => (
+            <Pressable
+              key={value}
+              style={[styles.avatarChoice, aprilAvatar === value && styles.avatarChoiceActive]}
+              onPress={async () => {
+                if (!sessionUser || aprilAvatar === value) return;
+                const previous = aprilAvatar;
+                setAprilAvatar(value);
+                const { error } = await supabase.from("profiles").update({ april_avatar: value }).eq("id", sessionUser.id);
+                if (error) {
+                  setAprilAvatar(previous);
+                  Alert.alert("Couldn’t save that choice", "Please try again.");
+                }
+              }}
+            >
+              <View style={styles.avatarChoicePreview}>{renderAprilCompanion(value === "orb" ? "small" : "checkin")}</View>
+              <Text style={[styles.avatarChoiceLabel, aprilAvatar === value && styles.avatarChoiceLabelActive]}>{label}</Text>
+              {aprilAvatar === value ? <Text style={styles.avatarChoiceCheck}>✓</Text> : null}
+            </Pressable>
+          ))}
+        </View>
+      </View>
+
+      <View style={styles.settingsCard}>
         <Text style={styles.settingLabel}>COMPANION</Text>
         <Text style={styles.settingValue}>Calm voice · English</Text>
         <Text style={styles.settingHint}>Warm, concise conversations focused on your wellbeing.</Text>
@@ -2052,6 +2112,27 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF2D6",
     opacity: 0.72,
   },
+
+  aprilPresenceSlot: { width: 156, height: 156, alignItems: "center", justifyContent: "center" },
+
+  avatarFigure: { width: 150, height: 150, alignItems: "center", justifyContent: "flex-end" },
+  avatarShoulders: { position: "absolute", bottom: 0, width: 150, height: 58, borderRadius: 75 },
+  avatarNeck: { position: "absolute", bottom: 48, width: 28, height: 30, borderRadius: 14 },
+  avatarHead: { position: "absolute", top: 18, width: 88, height: 98, borderRadius: 44, alignItems: "center" },
+  avatarHair: { position: "absolute", top: -4, width: 94, height: 43, borderRadius: 47 },
+  avatarEye: { position: "absolute", top: 51, width: 6, height: 5, borderRadius: 3, backgroundColor: "#241D1A" },
+  avatarAccent: { position: "absolute", top: 71, width: 22, height: 4, borderRadius: 4 },
+  avatarOrbMini: { width: 68, height: 68, borderRadius: 34, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: "rgba(232,163,61,0.24)", backgroundColor: "rgba(232,163,61,0.06)" },
+  avatarOrbCheckin: { width: 92, height: 92, borderRadius: 46 },
+  avatarOrbCore: { width: 40, height: 40, borderRadius: 20, backgroundColor: "#E8A33D", shadowColor: "#E8A33D", shadowOpacity: 0.34, shadowRadius: 18, shadowOffset: { width: 0, height: 5 }, elevation: 5 },
+
+  avatarPicker: { flexDirection: "row", flexWrap: "wrap", gap: 9, marginTop: 16 },
+  avatarChoice: { width: 84, minHeight: 108, borderRadius: 18, borderWidth: 1, borderColor: "#2A2F3A", backgroundColor: "#10151F", alignItems: "center", justifyContent: "center", paddingVertical: 10, position: "relative" },
+  avatarChoiceActive: { borderColor: "#E8A33D", backgroundColor: "#171A20" },
+  avatarChoicePreview: { height: 64, width: 64, alignItems: "center", justifyContent: "center", overflow: "hidden" },
+  avatarChoiceLabel: { color: "#9EA4B0", fontSize: 11, fontWeight: "600", marginTop: 6 },
+  avatarChoiceLabelActive: { color: "#E8A33D" },
+  avatarChoiceCheck: { position: "absolute", top: 6, right: 8, color: "#E8A33D", fontSize: 12, fontWeight: "800" },
 
   aprilHeroCopy: { flex: 1, paddingLeft: 15 },
 
