@@ -591,10 +591,12 @@ export default function HomeScreen() {
             <Text style={styles.authLogo}>APRIL</Text>
 
             <View style={styles.authCompanion}>
-              <View style={styles.authCore} />
-              <View style={styles.authEyeRow}>
-                <View style={styles.authEye} />
-                <View style={styles.authEye} />
+              <View style={styles.authPersonShoulders} />
+              <View style={styles.authPersonNeck} />
+              <View style={styles.authPersonHead}>
+                <View style={styles.authPersonHair} />
+                <View style={styles.authPersonEyeLeft} />
+                <View style={styles.authPersonEyeRight} />
               </View>
             </View>
 
@@ -1006,6 +1008,15 @@ export default function HomeScreen() {
           <Text style={styles.screenEyebrow}>DAILY CHECK-IN</Text>
           <View style={styles.progressRow}>{checkInQuestions.map((_, index) => <View key={index} style={[styles.progressDot, index <= checkInStep && styles.progressDotActive]} />)}</View>
           <Text style={styles.checkInStepText}>{checkInStep + 1} of {checkInQuestions.length}</Text>
+          <View style={styles.checkInCompanion}>
+            <View style={styles.checkInPersonShoulders} />
+            <View style={styles.checkInPersonNeck} />
+            <View style={styles.checkInPersonHead}>
+              <View style={styles.checkInPersonHair} />
+              <View style={styles.checkInPersonEyeLeft} />
+              <View style={styles.checkInPersonEyeRight} />
+            </View>
+          </View>
           {checkInContextNote && checkInStep === 1 ? (
             <View style={styles.contextNoteCard}>
               <Text style={styles.contextNoteLabel}>FROM YOUR TALK WITH APRIL</Text>
@@ -1060,11 +1071,13 @@ export default function HomeScreen() {
 
       <View style={styles.aprilHero}>
         <View style={styles.aprilPresence}>
-          <View style={styles.presenceRibbonOuter} />
-          <View style={styles.presenceRibbonMid} />
-          <View style={styles.presenceRibbonInner} />
-          <View style={styles.presenceCore}>
-            <View style={styles.presenceCoreLight} />
+          <View style={styles.personShouldersHome} />
+          <View style={styles.personNeckHome} />
+          <View style={styles.personHeadHome}>
+            <View style={styles.personHairHome} />
+            <View style={styles.personEyeHomeLeft} />
+            <View style={styles.personEyeHomeRight} />
+            <View style={styles.personSmileHome} />
           </View>
         </View>
         <View style={styles.aprilHeroCopy}>
@@ -1084,9 +1097,12 @@ export default function HomeScreen() {
 
       <Pressable style={styles.talkCard} onPress={() => handleTabChange("talk")}>
         <View style={styles.smallCompanion}>
-          <View style={styles.smallEyeRow}>
-            <View style={styles.smallEye} />
-            <View style={styles.smallEye} />
+          <View style={styles.smallPersonShoulders} />
+          <View style={styles.smallPersonNeck} />
+          <View style={styles.smallPersonHead}>
+            <View style={styles.smallPersonHair} />
+            <View style={styles.smallPersonEyeLeft} />
+            <View style={styles.smallPersonEyeRight} />
           </View>
         </View>
         <View style={styles.talkCardText}>
@@ -1175,12 +1191,14 @@ export default function HomeScreen() {
       </Text>
 
       <Animated.View style={[styles.talkBotStage, { transform: [{ scale: pulse }] }]}>
-        <View style={styles.talkPresenceHalo} />
-        <View style={styles.talkPresenceRibbonOne} />
-        <View style={styles.talkPresenceRibbonTwo} />
-        <View style={styles.talkPresenceRibbonThree} />
-        <View style={[styles.talkPresenceCore, isListening && styles.talkPresenceCoreListening]}>
-          <View style={styles.talkPresenceCoreLight} />
+        <View style={styles.talkPersonGlow} />
+        <View style={styles.talkPersonShoulders} />
+        <View style={styles.talkPersonNeck} />
+        <View style={[styles.talkPersonHead, isListening && styles.talkPersonHeadListening]}>
+          <View style={styles.talkPersonHair} />
+          <View style={styles.talkPersonEyeLeft} />
+          <View style={styles.talkPersonEyeRight} />
+          <View style={[styles.talkPersonMouth, isListening && styles.talkPersonMouthListening]} />
         </View>
         <View style={[styles.talkPresenceWave, isListening && styles.talkPresenceWaveActive]} />
       </Animated.View>
@@ -1933,6 +1951,47 @@ const styles = StyleSheet.create({
     marginBottom: 26,
   },
 
+
+  personShouldersHome:{position:"absolute",bottom:4,width:130,height:66,borderTopLeftRadius:65,borderTopRightRadius:65,backgroundColor:"#202A38",borderWidth:1,borderColor:"rgba(185,168,216,0.22)"},
+  personNeckHome:{position:"absolute",bottom:50,width:34,height:34,borderRadius:15,backgroundColor:"#B98262"},
+  personHeadHome:{position:"absolute",bottom:69,width:78,height:84,borderRadius:39,backgroundColor:"#C98F6E",overflow:"hidden",alignItems:"center",justifyContent:"center"},
+  personHairHome:{position:"absolute",top:-5,width:84,height:42,borderRadius:42,backgroundColor:"#171B24"},
+  personEyeHomeLeft:{position:"absolute",top:47,left:22,width:6,height:4,borderRadius:3,backgroundColor:"#2A2020"},
+  personEyeHomeRight:{position:"absolute",top:47,right:22,width:6,height:4,borderRadius:3,backgroundColor:"#2A2020"},
+  personSmileHome:{position:"absolute",bottom:17,width:17,height:5,borderRadius:5,borderBottomWidth:1,borderBottomColor:"#6F463B"},
+  talkPersonGlow:{position:"absolute",width:210,height:210,borderRadius:105,backgroundColor:"rgba(232,163,61,0.055)",borderWidth:1,borderColor:"rgba(232,163,61,0.14)"},
+  talkPersonShoulders:{position:"absolute",bottom:2,width:182,height:92,borderTopLeftRadius:91,borderTopRightRadius:91,backgroundColor:"#202A38"},
+  talkPersonNeck:{position:"absolute",bottom:64,width:46,height:44,borderRadius:19,backgroundColor:"#B98262"},
+  talkPersonHead:{position:"absolute",bottom:89,width:108,height:116,borderRadius:54,backgroundColor:"#C98F6E",overflow:"hidden",alignItems:"center",justifyContent:"center"},
+  talkPersonHeadListening:{backgroundColor:"#D29A76"},
+  talkPersonHair:{position:"absolute",top:-7,width:116,height:56,borderRadius:58,backgroundColor:"#171B24"},
+  talkPersonEyeLeft:{position:"absolute",top:64,left:31,width:7,height:5,borderRadius:4,backgroundColor:"#2A2020"},
+  talkPersonEyeRight:{position:"absolute",top:64,right:31,width:7,height:5,borderRadius:4,backgroundColor:"#2A2020"},
+  talkPersonMouth:{position:"absolute",bottom:23,width:23,height:6,borderRadius:6,borderBottomWidth:1.5,borderBottomColor:"#6F463B"},
+  talkPersonMouthListening:{width:17,height:11,borderRadius:8,backgroundColor:"rgba(111,70,59,0.55)"},
+  talkPersonHalo:{position:"absolute",width:194,height:194,borderRadius:97,borderWidth:1,borderColor:"rgba(232,163,61,0.10)"},
+  talkPersonHaloActive:{width:214,height:214,borderColor:"rgba(232,163,61,0.25)",backgroundColor:"rgba(232,163,61,0.035)"},
+  talkPersonWave:{position:"absolute",width:92,height:30,borderRadius:15,borderWidth:1,borderColor:"rgba(232,163,61,0)",opacity:0},
+  talkPersonWaveActive:{width:166,height:70,borderColor:"rgba(232,163,61,0.24)",opacity:1},
+  smallPersonShoulders:{position:"absolute",bottom:-2,width:55,height:24,borderTopLeftRadius:28,borderTopRightRadius:28,backgroundColor:"#202A38"},
+  smallPersonNeck:{position:"absolute",bottom:19,width:13,height:13,borderRadius:6,backgroundColor:"#B98262"},
+  smallPersonHead:{position:"absolute",bottom:26,width:31,height:34,borderRadius:16,backgroundColor:"#C98F6E",overflow:"hidden"},
+  smallPersonHair:{position:"absolute",top:-2,width:34,height:16,borderRadius:17,backgroundColor:"#171B24"},
+  smallPersonEyeLeft:{position:"absolute",top:19,left:8,width:3,height:2,borderRadius:2,backgroundColor:"#2A2020"},
+  smallPersonEyeRight:{position:"absolute",top:19,right:8,width:3,height:2,borderRadius:2,backgroundColor:"#2A2020"},
+  checkInCompanion:{width:96,height:96,alignSelf:"center",marginVertical:4,alignItems:"center",justifyContent:"flex-end",position:"relative"},
+  checkInPersonShoulders:{position:"absolute",bottom:0,width:92,height:38,borderTopLeftRadius:46,borderTopRightRadius:46,backgroundColor:"#202A38"},
+  checkInPersonNeck:{position:"absolute",bottom:29,width:23,height:24,borderRadius:10,backgroundColor:"#B98262"},
+  checkInPersonHead:{position:"absolute",bottom:44,width:53,height:57,borderRadius:27,backgroundColor:"#C98F6E",overflow:"hidden"},
+  checkInPersonHair:{position:"absolute",top:-3,width:57,height:27,borderRadius:29,backgroundColor:"#171B24"},
+  checkInPersonEyeLeft:{position:"absolute",top:31,left:15,width:4,height:3,borderRadius:2,backgroundColor:"#2A2020"},
+  checkInPersonEyeRight:{position:"absolute",top:31,right:15,width:4,height:3,borderRadius:2,backgroundColor:"#2A2020"},
+  authPersonShoulders:{position:"absolute",bottom:0,width:108,height:50,borderTopLeftRadius:54,borderTopRightRadius:54,backgroundColor:"#202A38"},
+  authPersonNeck:{position:"absolute",bottom:37,width:28,height:27,borderRadius:12,backgroundColor:"#B98262"},
+  authPersonHead:{position:"absolute",bottom:51,width:62,height:68,borderRadius:31,backgroundColor:"#C98F6E",overflow:"hidden"},
+  authPersonHair:{position:"absolute",top:-3,width:66,height:34,borderRadius:33,backgroundColor:"#171B24"},
+  authPersonEyeLeft:{position:"absolute",top:38,left:18,width:5,height:4,borderRadius:3,backgroundColor:"#2A2020"},
+  authPersonEyeRight:{position:"absolute",top:38,right:18,width:5,height:4,borderRadius:3,backgroundColor:"#2A2020"},
   aprilPresence: {
     width: 156,
     height: 156,
