@@ -1059,22 +1059,12 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.aprilHero}>
-        <View style={styles.aprilHeroOrb}>
-          <View style={[styles.orbit, styles.orbitA]} />
-          <View style={[styles.orbit, styles.orbitB]} />
-          <View style={[styles.orbitDot, styles.orbitDotA]} />
-          <View style={[styles.orbitDot, styles.orbitDotB]} />
-          <View style={styles.aprilAura} />
-          <View style={styles.aprilBotFace}>
-            <View style={styles.aprilBotBrowRow}>
-              <View style={styles.aprilBotBrow} />
-              <View style={styles.aprilBotBrow} />
-            </View>
-            <View style={styles.aprilBotEyeRow}>
-              <View style={styles.aprilBotEye}><View style={styles.aprilBotEyeGlow} /></View>
-              <View style={styles.aprilBotEye}><View style={styles.aprilBotEyeGlow} /></View>
-            </View>
-            <View style={styles.aprilBotMouth} />
+        <View style={styles.aprilPresence}>
+          <View style={styles.presenceRibbonOuter} />
+          <View style={styles.presenceRibbonMid} />
+          <View style={styles.presenceRibbonInner} />
+          <View style={styles.presenceCore}>
+            <View style={styles.presenceCoreLight} />
           </View>
         </View>
         <View style={styles.aprilHeroCopy}>
@@ -1185,21 +1175,14 @@ export default function HomeScreen() {
       </Text>
 
       <Animated.View style={[styles.talkBotStage, { transform: [{ scale: pulse }] }]}>
-        <View style={[styles.talkOrbit, styles.talkOrbitOne]} />
-        <View style={[styles.talkOrbit, styles.talkOrbitTwo]} />
-        <View style={styles.talkOrbitDot} />
-        <View style={styles.talkBotAura} />
-        <View style={styles.talkBotFace}>
-          <View style={styles.aprilBotBrowRow}>
-            <View style={styles.aprilBotBrow} />
-            <View style={styles.aprilBotBrow} />
-          </View>
-          <View style={styles.aprilBotEyeRow}>
-            <View style={styles.aprilBotEye}><View style={styles.aprilBotEyeGlow} /></View>
-            <View style={styles.aprilBotEye}><View style={styles.aprilBotEyeGlow} /></View>
-          </View>
-          <View style={[styles.aprilBotMouth, isListening && styles.aprilBotMouthListening]} />
+        <View style={styles.talkPresenceHalo} />
+        <View style={styles.talkPresenceRibbonOne} />
+        <View style={styles.talkPresenceRibbonTwo} />
+        <View style={styles.talkPresenceRibbonThree} />
+        <View style={[styles.talkPresenceCore, isListening && styles.talkPresenceCoreListening]}>
+          <View style={styles.talkPresenceCoreLight} />
         </View>
+        <View style={[styles.talkPresenceWave, isListening && styles.talkPresenceWaveActive]} />
       </Animated.View>
 
       {transcript.length > 0 && (
@@ -1950,7 +1933,7 @@ const styles = StyleSheet.create({
     marginBottom: 26,
   },
 
-  aprilHeroOrb: {
+  aprilPresence: {
     width: 156,
     height: 156,
     alignItems: "center",
@@ -1958,108 +1941,57 @@ const styles = StyleSheet.create({
     position: "relative",
   },
 
-  orbit: {
+  presenceRibbonOuter: {
     position: "absolute",
-    borderWidth: 1,
-    borderRadius: 999,
-  },
-
-  orbitA: {
-    width: 148,
-    height: 148,
+    width: 116,
+    height: 142,
+    borderRadius: 58,
+    borderWidth: 1.5,
     borderColor: "rgba(232,163,61,0.34)",
-    transform: [{ rotate: "18deg" }],
+    transform: [{ rotate: "28deg" }],
   },
 
-  orbitB: {
-    width: 126,
-    height: 126,
-    borderColor: "rgba(142,214,177,0.22)",
-    transform: [{ rotate: "-24deg" }],
-  },
-
-  orbitDot: {
+  presenceRibbonMid: {
     position: "absolute",
-    width: 7,
-    height: 7,
-    borderRadius: 4,
+    width: 96,
+    height: 132,
+    borderRadius: 48,
+    borderWidth: 1.5,
+    borderColor: "rgba(185,168,216,0.30)",
+    transform: [{ rotate: "-30deg" }],
   },
 
-  orbitDotA: { backgroundColor: "#E8A33D", top: 10, right: 27 },
-  orbitDotB: { backgroundColor: "#8ED6B1", bottom: 18, left: 21 },
-
-  aprilAura: {
+  presenceRibbonInner: {
     position: "absolute",
-    width: 112,
-    height: 112,
-    borderRadius: 56,
-    backgroundColor: "rgba(232,163,61,0.13)",
-    borderWidth: 1,
-    borderColor: "rgba(232,163,61,0.18)",
+    width: 72,
+    height: 116,
+    borderRadius: 36,
+    borderWidth: 1.5,
+    borderColor: "rgba(142,214,177,0.30)",
+    transform: [{ rotate: "11deg" }],
   },
 
-  aprilBotFace: {
-    width: 88,
-    height: 88,
-    borderRadius: 30,
+  presenceCore: {
+    width: 42,
+    height: 92,
+    borderRadius: 22,
     backgroundColor: "#E8A33D",
     alignItems: "center",
     justifyContent: "center",
-    transform: [{ rotate: "-3deg" }],
+    transform: [{ rotate: "-8deg" }],
     shadowColor: "#E8A33D",
-    shadowOpacity: 0.24,
-    shadowRadius: 18,
+    shadowOpacity: 0.30,
+    shadowRadius: 22,
     shadowOffset: { width: 0, height: 7 },
-    elevation: 5,
+    elevation: 6,
   },
 
-  aprilBotBrowRow: {
-    flexDirection: "row",
-    gap: 28,
-    marginBottom: 7,
-  },
-
-  aprilBotBrow: {
-    width: 15,
-    height: 3,
-    borderRadius: 3,
-    backgroundColor: "rgba(11,14,20,0.52)",
-  },
-
-  aprilBotEyeRow: {
-    flexDirection: "row",
-    gap: 22,
-    marginBottom: 10,
-  },
-
-  aprilBotEye: {
-    width: 16,
-    height: 21,
-    borderRadius: 8,
-    backgroundColor: "#0B0E14",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  aprilBotEyeGlow: {
-    width: 5,
-    height: 7,
-    borderRadius: 3,
-    backgroundColor: "#FFFFFF",
+  presenceCoreLight: {
+    width: 7,
+    height: 52,
+    borderRadius: 4,
+    backgroundColor: "#FFF2D6",
     opacity: 0.72,
-  },
-
-  aprilBotMouth: {
-    width: 25,
-    height: 8,
-    borderRadius: 6,
-    backgroundColor: "#0B0E14",
-  },
-
-  aprilBotMouthListening: {
-    width: 13,
-    height: 17,
-    borderRadius: 9,
   },
 
   aprilHeroCopy: { flex: 1, paddingLeft: 15 },
@@ -2097,59 +2029,91 @@ const styles = StyleSheet.create({
     position: "relative",
   },
 
-  talkOrbit: {
+  talkPresenceHalo: {
     position: "absolute",
+    width: 196,
+    height: 196,
+    borderRadius: 98,
     borderWidth: 1,
-    borderRadius: 999,
+    borderColor: "rgba(232,163,61,0.12)",
+    backgroundColor: "rgba(232,163,61,0.035)",
   },
 
-  talkOrbitOne: {
-    width: 214,
-    height: 214,
-    borderColor: "rgba(232,163,61,0.24)",
-    transform: [{ rotate: "20deg" }],
-  },
-
-  talkOrbitTwo: {
-    width: 176,
-    height: 176,
-    borderColor: "rgba(185,168,216,0.22)",
-    transform: [{ rotate: "-28deg" }],
-  },
-
-  talkOrbitDot: {
+  talkPresenceRibbonOne: {
     position: "absolute",
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "#E8A33D",
-    top: 18,
-    right: 35,
+    width: 142,
+    height: 202,
+    borderRadius: 71,
+    borderWidth: 1.5,
+    borderColor: "rgba(232,163,61,0.30)",
+    transform: [{ rotate: "32deg" }],
   },
 
-  talkBotAura: {
+  talkPresenceRibbonTwo: {
     position: "absolute",
-    width: 154,
-    height: 154,
-    borderRadius: 77,
-    backgroundColor: "rgba(232,163,61,0.12)",
-    borderWidth: 1,
-    borderColor: "rgba(232,163,61,0.2)",
-  },
-
-  talkBotFace: {
     width: 124,
-    height: 124,
-    borderRadius: 40,
+    height: 188,
+    borderRadius: 62,
+    borderWidth: 1.5,
+    borderColor: "rgba(185,168,216,0.28)",
+    transform: [{ rotate: "-29deg" }],
+  },
+
+  talkPresenceRibbonThree: {
+    position: "absolute",
+    width: 102,
+    height: 176,
+    borderRadius: 51,
+    borderWidth: 1.5,
+    borderColor: "rgba(142,214,177,0.27)",
+    transform: [{ rotate: "8deg" }],
+  },
+
+  talkPresenceCore: {
+    width: 54,
+    height: 132,
+    borderRadius: 28,
     backgroundColor: "#E8A33D",
     alignItems: "center",
     justifyContent: "center",
-    transform: [{ rotate: "-3deg" }],
+    transform: [{ rotate: "-7deg" }],
     shadowColor: "#E8A33D",
-    shadowOpacity: 0.3,
-    shadowRadius: 25,
+    shadowOpacity: 0.34,
+    shadowRadius: 30,
     shadowOffset: { width: 0, height: 10 },
-    elevation: 8,
+    elevation: 9,
+  },
+
+  talkPresenceCoreListening: {
+    width: 68,
+    height: 148,
+    borderRadius: 34,
+    backgroundColor: "#F0B75A",
+  },
+
+  talkPresenceCoreLight: {
+    width: 8,
+    height: 78,
+    borderRadius: 5,
+    backgroundColor: "#FFF5DF",
+    opacity: 0.78,
+  },
+
+  talkPresenceWave: {
+    position: "absolute",
+    width: 84,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "rgba(232,163,61,0.0)",
+    opacity: 0,
+  },
+
+  talkPresenceWaveActive: {
+    width: 150,
+    height: 58,
+    borderColor: "rgba(232,163,61,0.25)",
+    opacity: 1,
   },
 
   talkContent: {
