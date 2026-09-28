@@ -1127,7 +1127,7 @@ export default function HomeScreen() {
         </View>
       );
     }
-    const scale = mode === "talk" ? 1.0 : mode === "hero" ? 0.86 : mode === "checkin" ? 0.52 : 0.38;
+    const portraitScale = mode === "talk" ? 1.0 : mode === "hero" ? 0.86 : mode === "checkin" ? 0.52 : 0.38;
     const portraitPosition = {
       "white-man": { left: 0, top: 0 },
       "colored-man": { left: -154, top: 0 },
@@ -1136,7 +1136,7 @@ export default function HomeScreen() {
     } as const;
     const position = portraitPosition[aprilAvatar];
     return (
-      <View style={[styles.humanPortrait, { transform: [{ scale }] }]}>
+      <View style={[styles.humanPortrait, { transform: [{ scale: portraitScale }] }]}>
         <Image
           source={{ uri: "/avatars/april-avatars-sheet.jpg" }}
           style={[styles.humanPortraitImage, { left: position.left, top: position.top }]}
