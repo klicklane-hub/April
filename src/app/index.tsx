@@ -26,7 +26,7 @@ export default function HomeScreen() {
   const [sessionUser, setSessionUser] = useState<any>(null);
   const [profileReady, setProfileReady] = useState(false);
   const [profileName, setProfileName] = useState("");
-  const [aprilAvatar, setAprilAvatar] = useState<"orb" | "warm" | "calm" | "bright" | "grounded">("orb");
+  const [aprilAvatar, setAprilAvatar] = useState<"orb" | "white-man" | "colored-man" | "white-woman" | "colored-woman">("orb");
   const [activeTab, setActiveTab] = useState<"home" | "talk" | "health" | "insights" | "me" | "checkin">("home");
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
 
@@ -1116,60 +1116,41 @@ export default function HomeScreen() {
 
   const renderAprilCompanion = (mode: "hero" | "talk" | "small" | "checkin") => {
     const scale = mode === "talk" ? 1.08 : mode === "hero" ? 0.92 : mode === "checkin" ? 0.66 : 0.42;
-    const palette = {
-      warm: { skin: "#D49B78", hair: "#171B24", shirt: "#B9A8D8", accent: "#E8A33D" },
-      calm: { skin: "#C88F78", hair: "#26313A", shirt: "#8ED6B1", accent: "#9DCBC1" },
-      bright: { skin: "#D8A07A", hair: "#3A2520", shirt: "#E8A33D", accent: "#F2C36B" },
-      grounded: { skin: "#8E6252", hair: "#17171A", shirt: "#667085", accent: "#B9A8D8" },
-    } as const;
-
     if (aprilAvatar === "orb") {
-      if (mode === "talk") {
-        return (
-          <>
-            <View style={styles.talkPresenceHalo} />
-            <View style={styles.talkPresenceRibbonOne} />
-            <View style={styles.talkPresenceRibbonTwo} />
-            <View style={styles.talkPresenceRibbonThree} />
-            <View style={[styles.talkPresenceCore, isListening && styles.talkPresenceCoreListening]}>
-              <View style={styles.talkPresenceCoreLight} />
-            </View>
-            <View style={[styles.talkPresenceWave, isListening && styles.talkPresenceWaveActive]} />
-          </>
-        );
-      }
-      if (mode === "hero") {
-        return (
-          <View style={styles.aprilPresence}>
-            <View style={styles.presenceRibbonOuter} />
-            <View style={styles.presenceRibbonMid} />
-            <View style={styles.presenceRibbonInner} />
-            <View style={styles.presenceCore}><View style={styles.presenceCoreLight} /></View>
-          </View>
-        );
-      }
-      return (
-        <View style={[styles.avatarOrbMini, mode === "checkin" && styles.avatarOrbCheckin]}>
-          <View style={styles.avatarOrbCore} />
-        </View>
-      );
+      if (mode === "talk") return (<><View style={styles.talkPresenceHalo} /><View style={styles.talkPresenceRibbonOne} /><View style={styles.talkPresenceRibbonTwo} /><View style={styles.talkPresenceRibbonThree} /><View style={[styles.talkPresenceCore, isListening && styles.talkPresenceCoreListening]}><View style={styles.talkPresenceCoreLight} /></View><View style={[styles.talkPresenceWave, isListening && styles.talkPresenceWaveActive]} /></>);
+      if (mode === "hero") return (<View style={styles.aprilPresence}><View style={styles.presenceRibbonOuter} /><View style={styles.presenceRibbonMid} /><View style={styles.presenceRibbonInner} /><View style={styles.presenceCore}><View style={styles.presenceCoreLight} /></View></View>);
+      return (<View style={[styles.avatarOrbMini, mode === "checkin" && styles.avatarOrbCheckin]}><View style={styles.avatarOrbCore} /></View>);
     }
-
-    const p = palette[aprilAvatar];
+    const people = {
+      "white-man": { skin: "#F1C7A6", shadow: "#DFA982", hair: "#4A3328", highlight: "#72503C", shirt: "#65748B", lip: "#9C625A", eye: "#3A2B25" },
+      "colored-man": { skin: "#8A563F", shadow: "#714432", hair: "#171515", highlight: "#302725", shirt: "#596B63", lip: "#6F3D3D", eye: "#241C19" },
+      "white-woman": { skin: "#F2CBB1", shadow: "#E0AA89", hair: "#6B4632", highlight: "#9A6B4E", shirt: "#B9A8D8", lip: "#A85E68", eye: "#40302A" },
+      "colored-woman": { skin: "#9A624A", shadow: "#7C4937", hair: "#171414", highlight: "#3B2824", shirt: "#8ED6B1", lip: "#743B42", eye: "#211816" },
+    } as const;
+    const p = people[aprilAvatar];
     return (
-      <View style={[styles.avatarFigure, { transform: [{ scale }] }]}>
-        <View style={[styles.avatarShoulders, { backgroundColor: p.shirt }]} />
-        <View style={[styles.avatarNeck, { backgroundColor: p.skin }]} />
-        <View style={[styles.avatarHead, { backgroundColor: p.skin }]}>
-          <View style={[styles.avatarHair, { backgroundColor: p.hair }]} />
-          <View style={[styles.avatarEye, { left: 25 }]} />
-          <View style={[styles.avatarEye, { right: 25 }]} />
-          <View style={[styles.avatarAccent, { backgroundColor: p.accent }]} />
+      <View style={[styles.humanAvatar, { transform: [{ scale }] }]}>
+        <View style={styles.humanAura} />
+        <View style={[styles.humanShoulders, { backgroundColor: p.shirt }]} />
+        <View style={[styles.humanNeck, { backgroundColor: p.shadow }]} />
+        <View style={[styles.humanEar, { backgroundColor: p.skin }]} />
+        <View style={[styles.humanEar, { backgroundColor: p.skin, right: 24, left: undefined }]} />
+        <View style={[styles.humanHead, { backgroundColor: p.skin }]}>
+          <View style={[styles.humanHairBack, { backgroundColor: p.hair }]} />
+          <View style={[styles.humanHairTop, { backgroundColor: p.hair }]} />
+          <View style={[styles.humanHairHighlight, { backgroundColor: p.highlight }]} />
+          <View style={[styles.humanBrow, { backgroundColor: p.eye, left: 27 }]} />
+          <View style={[styles.humanBrow, { backgroundColor: p.eye, right: 27, left: undefined }]} />
+          <View style={[styles.humanEye, { left: 27 }]}><View style={[styles.humanPupil, { backgroundColor: p.eye }]} /></View>
+          <View style={[styles.humanEye, { right: 27, left: undefined }]}><View style={[styles.humanPupil, { backgroundColor: p.eye }]} /></View>
+          <View style={[styles.humanNose, { borderColor: p.shadow }]} />
+          <View style={[styles.humanMouth, { backgroundColor: p.lip }]} />
+          <View style={[styles.humanChin, { backgroundColor: p.shadow }]} />
         </View>
+        <View style={[styles.humanCollar, { borderColor: p.shirt }]} />
       </View>
     );
   };
-
   const renderHome = () => (
     <ScrollView contentContainerStyle={styles.dashboardContent}>
       <View style={styles.dashboardHeader}>
@@ -1743,10 +1724,10 @@ export default function HomeScreen() {
         <View style={styles.avatarPicker}>
           {([
             ["orb", "Orb"],
-            ["warm", "Warm"],
-            ["calm", "Calm"],
-            ["bright", "Bright"],
-            ["grounded", "Grounded"],
+            ["white-man", "White man"],
+            ["colored-man", "Colored man"],
+            ["white-woman", "White woman"],
+            ["colored-woman", "Colored woman"],
           ] as const).map(([value, label]) => (
             <Pressable
               key={value}
@@ -2177,13 +2158,22 @@ const styles = StyleSheet.create({
 
   aprilPresenceSlot: { width: 156, height: 156, alignItems: "center", justifyContent: "center" },
 
-  avatarFigure: { width: 150, height: 150, alignItems: "center", justifyContent: "flex-end" },
-  avatarShoulders: { position: "absolute", bottom: 0, width: 150, height: 58, borderRadius: 75 },
-  avatarNeck: { position: "absolute", bottom: 48, width: 28, height: 30, borderRadius: 14 },
-  avatarHead: { position: "absolute", top: 18, width: 88, height: 98, borderRadius: 44, alignItems: "center" },
-  avatarHair: { position: "absolute", top: -4, width: 94, height: 43, borderRadius: 47 },
-  avatarEye: { position: "absolute", top: 51, width: 6, height: 5, borderRadius: 3, backgroundColor: "#241D1A" },
-  avatarAccent: { position: "absolute", top: 71, width: 22, height: 4, borderRadius: 4 },
+  humanAvatar: { width: 150, height: 174, alignItems: "center", justifyContent: "flex-end", position: "relative" },
+  humanAura: { position: "absolute", top: 5, width: 148, height: 148, borderRadius: 74, backgroundColor: "rgba(232,163,61,0.045)", borderWidth: 1, borderColor: "rgba(232,163,61,0.13)" },
+  humanShoulders: { position: "absolute", bottom: 0, width: 144, height: 67, borderTopLeftRadius: 62, borderTopRightRadius: 62, borderBottomLeftRadius: 20, borderBottomRightRadius: 20 },
+  humanNeck: { position: "absolute", bottom: 54, width: 34, height: 34, borderRadius: 13 },
+  humanHead: { width: 92, height: 108, borderRadius: 45, position: "relative", overflow: "hidden", marginBottom: 19, shadowColor: "#000000", shadowOpacity: 0.18, shadowRadius: 12, shadowOffset: { width: 0, height: 5 }, elevation: 4 },
+  humanHairBack: { position: "absolute", top: 2, left: -5, right: -5, height: 64, borderRadius: 38 },
+  humanHairTop: { position: "absolute", top: -13, left: 6, right: 6, height: 51, borderRadius: 28 },
+  humanHairHighlight: { position: "absolute", top: 5, left: 19, width: 30, height: 12, borderRadius: 8, opacity: 0.55 },
+  humanBrow: { position: "absolute", top: 45, width: 18, height: 3, borderRadius: 3 },
+  humanEye: { position: "absolute", top: 51, width: 17, height: 9, borderRadius: 9, backgroundColor: "#F8F4EF", alignItems: "center", justifyContent: "center" },
+  humanPupil: { width: 5, height: 7, borderRadius: 4 },
+  humanNose: { position: "absolute", top: 58, left: 43, width: 8, height: 19, borderRightWidth: 1.5, borderBottomWidth: 1.5, borderRadius: 5 },
+  humanMouth: { position: "absolute", top: 82, left: 35, width: 23, height: 6, borderRadius: 8 },
+  humanChin: { position: "absolute", top: 90, left: 39, width: 15, height: 7, borderRadius: 8, opacity: 0.24 },
+  humanEar: { position: "absolute", bottom: 58, left: 24, width: 10, height: 22, borderRadius: 6 },
+  humanCollar: { position: "absolute", bottom: 49, width: 48, height: 16, borderTopWidth: 2, borderRadius: 24, opacity: 0.55 },
   avatarOrbMini: { width: 68, height: 68, borderRadius: 34, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: "rgba(232,163,61,0.24)", backgroundColor: "rgba(232,163,61,0.06)" },
   avatarOrbCheckin: { width: 92, height: 92, borderRadius: 46 },
   avatarOrbCore: { width: 40, height: 40, borderRadius: 20, backgroundColor: "#E8A33D", shadowColor: "#E8A33D", shadowOpacity: 0.34, shadowRadius: 18, shadowOffset: { width: 0, height: 5 }, elevation: 5 },
