@@ -62,10 +62,12 @@ export default function HomeScreen() {
 
   const pulse = useRef(new Animated.Value(1)).current;
   const latestTranscript = useRef("");
+  const talkFinalTranscript = useRef("");
   const talkContext = useRef<{ role: string; content: string }[]>([]);
   const checkInVoiceActive = useRef(false);
   const checkInFlowActive = useRef(false);
   const talkFlowActive = useRef(false);
+  const talkUserStopping = useRef(false);
   const suppressSpeechEnd = useRef(false);
   const checkInStepRef = useRef(0);
 
@@ -201,9 +203,27 @@ export default function HomeScreen() {
 
   useSpeechRecognitionEvent("result", (event) => {
     if (suppressSpeechEnd.current) return;
-    const text = event.results?.[0]?.transcript ?? "";
-    latestTranscript.current = text;
-    setTranscript(text);
+    const text = event.results?.[0]?.transcript?.trim() ?? "";
+    if (!text) return;
+
+    if (checkInVoiceActive.current) {
+      latestTranscript.current = text;
+      setTranscript(text);
+      return;
+    }
+
+    if (event.isFinal) {
+      const previous = talkFinalTranscript.current.trim();
+      if (!previous || !previous.endsWith(text)) {
+        talkFinalTranscript.current = previous ? `${previous} ${text}`.trim() : text;
+      }
+      latestTranscript.current = talkFinalTranscript.current;
+      setTranscript(talkFinalTranscript.current);
+    } else {
+      const combined = `${talkFinalTranscript.current.trim()} ${text}`.trim();
+      latestTranscript.current = combined;
+      setTranscript(combined);
+    }
   });
 
   const speakAprilResponse = (text: string) => {
@@ -288,7 +308,16 @@ export default function HomeScreen() {
       return;
     }
 
-    if (spoken) {
+    if (talkUserStopping.current) {
+      talkUserStopping.current = false;
+      if (!spoken) {
+        talkFlowActive.current = false;
+        setTalkStatus("idle");
+        setAprilResponse("I didn’t catch anything. Take your time and try again.");
+        return;
+      }
+
+      setTalkStatus("thinking");
       setAprilResponse("Thinking…");
       const context = talkContext.current.slice(-6);
       askApril(spoken, context).then((reply) => {
@@ -301,6 +330,26 @@ export default function HomeScreen() {
         setAprilResponse(reply);
         speakAprilResponse(reply);
       });
+      return;
+    }
+
+    if (talkFlowActive.current && !checkInVoiceActive.current) {
+      setTalkStatus("listening");
+      setTimeout(() => {
+        if (!talkFlowActive.current || talkUserStopping.current || checkInVoiceActive.current) return;
+        try {
+          ExpoSpeechRecognitionModule.start({
+            lang: "en-US",
+            interimResults: true,
+            continuous: true,
+          });
+        } catch (error: any) {
+          console.log("APRIL speech recognition restart error:", error?.message || String(error));
+          setTalkStatus("idle");
+          setTalkError(true);
+          setAprilResponse("I lost the listening connection. Please tap to try again.");
+        }
+      }, 250);
     }
   });
 
@@ -446,6 +495,7 @@ export default function HomeScreen() {
 
   const startListening = async () => {
     talkFlowActive.current = true;
+    talkUserStopping.current = false;
     const permission =
       await ExpoSpeechRecognitionModule.requestPermissionsAsync();
 
@@ -463,12 +513,13 @@ export default function HomeScreen() {
     setAprilResponse("");
     setTalkError(false);
     latestTranscript.current = "";
+    talkFinalTranscript.current = "";
 
     try {
       ExpoSpeechRecognitionModule.start({
         lang: "en-US",
         interimResults: true,
-        continuous: false,
+        continuous: true,
       });
     } catch (error: any) {
       console.log("APRIL microphone start error:", error?.message || String(error));
@@ -485,6 +536,8 @@ export default function HomeScreen() {
     setAprilResponse("");
     setTranscript("");
     latestTranscript.current = "";
+    talkFinalTranscript.current = "";
+    talkUserStopping.current = false;
     setTalkStatus("listening");
     startListening();
   };
@@ -495,6 +548,7 @@ export default function HomeScreen() {
 
   const handleTalk = () => {
     if (isListening) {
+      talkUserStopping.current = true;
       setTalkStatus("thinking");
       stopListening();
     } else {
@@ -513,9 +567,11 @@ export default function HomeScreen() {
     }
     checkInVoiceActive.current = false;
     talkFlowActive.current = false;
+    talkUserStopping.current = false;
     setTalkError(false);
     talkContext.current = [];
     latestTranscript.current = "";
+    talkFinalTranscript.current = "";
     setIsListening(false);
     setTranscript("");
     setAprilResponse("");
@@ -531,8 +587,10 @@ export default function HomeScreen() {
       ExpoSpeechRecognitionModule.stop();
     }
     talkFlowActive.current = false;
+    talkUserStopping.current = false;
     checkInVoiceActive.current = false;
     latestTranscript.current = "";
+    talkFinalTranscript.current = "";
     setIsListening(false);
     setTalkStatus("idle");
     setTalkError(false);
@@ -550,6 +608,7 @@ export default function HomeScreen() {
     checkInFlowActive.current = false;
     checkInVoiceActive.current = false;
     talkFlowActive.current = false;
+    talkUserStopping.current = false;
     setIsListening(false);
     if (tab !== "talk") {
       talkContext.current = [];
@@ -2623,6 +2682,7 @@ const styles = StyleSheet.create({
   conversationButtonText: { color: "#0B0E14", fontSize: 16, fontWeight: "700" },
   voiceAnswerButton: { marginTop: 14, minHeight: 52, borderRadius: 16, borderWidth: 1, borderColor: "#343C4B", backgroundColor: "#111620", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 9 },
   voiceAnswerButtonActive: { borderColor: "#E8A33D", backgroundColor: "#171A20" },
+  talkListeningHint: { color: "#777D89", fontSize: 12, lineHeight: 18, textAlign: "center", marginTop: 10, maxWidth: 320 },
   voiceAnswerIcon: { color: "#E8A33D", fontSize: 14 },
   voiceAnswerText: { color: "#D7DAE0", fontSize: 15, fontWeight: "600" },
   checkInContent: { flexGrow: 1, paddingHorizontal: 22, paddingTop: 28, paddingBottom: 110 },
