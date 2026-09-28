@@ -1058,6 +1058,24 @@ export default function HomeScreen() {
         <View style={styles.statusDot} />
       </View>
 
+      <View style={styles.homePresence}>
+        <View style={styles.homePresenceOuter}>
+          <View style={styles.homePresenceMid}>
+            <View style={styles.homePresenceCore}>
+              <View style={styles.homePresenceEyes}>
+                <View style={styles.homePresenceEye} />
+                <View style={styles.homePresenceEye} />
+              </View>
+              <View style={styles.homePresenceMouth} />
+            </View>
+          </View>
+        </View>
+        <View style={styles.homePresenceCopy}>
+          <Text style={styles.homePresenceLabel}>APRIL</Text>
+          <Text style={styles.homePresenceText}>I’m here. Take your time.</Text>
+        </View>
+      </View>
+
       <Text style={styles.question}>How are you feeling today?</Text>
       <Text style={styles.dashboardSubtitle}>
         You don’t have to fill anything out. Just talk to APRIL.
@@ -1677,7 +1695,7 @@ export default function HomeScreen() {
             ["insights", "Insights"],
             ["me", "Me"],
           ].map(([key, label]) => (
-            <Pressable key={key} style={styles.tab} onPress={() => handleTabChange(key as typeof activeTab)}>
+            <Pressable key={key} style={[styles.tab, activeTab === key && styles.tabActive]} onPress={() => handleTabChange(key as typeof activeTab)}>
               <View style={[styles.tabMark, activeTab === key && styles.tabMarkActive]} />
               <Text style={[styles.tabLabel, activeTab === key && styles.tabLabelActive]}>{label}</Text>
             </Pressable>
@@ -1690,12 +1708,12 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  container: { flex: 1, backgroundColor: "#0B0E14" },
+  container: { flex: 1, backgroundColor: "#090C12" },
 
   authBackgroundArt: {
     ...StyleSheet.absoluteFillObject,
     overflow: "hidden",
-    opacity: 0.92,
+    opacity: 0.96,
   },
   backgroundArt: {
     ...StyleSheet.absoluteFillObject,
@@ -1909,18 +1927,20 @@ const styles = StyleSheet.create({
   },
 
   companionGlow: {
-    width: 190,
-    height: 190,
+    width: 210,
+    height: 210,
     borderRadius: 95,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(232, 163, 61, 0.12)",
+    backgroundColor: "rgba(232, 163, 61, 0.09)",
+    borderWidth: 1,
+    borderColor: "rgba(232,163,61,0.16)",
     marginBottom: 42,
   },
 
   companion: {
-    width: 145,
-    height: 145,
+    width: 150,
+    height: 150,
     borderRadius: 72,
     backgroundColor: "#E8A33D",
     alignItems: "center",
@@ -2037,6 +2057,53 @@ const styles = StyleSheet.create({
     backgroundColor: "#8ED6B1",
   },
 
+  homePresence: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 28,
+    padding: 10,
+    paddingLeft: 0,
+  },
+  homePresenceOuter: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "rgba(232,163,61,0.22)",
+    backgroundColor: "rgba(232,163,61,0.045)",
+  },
+  homePresenceMid: {
+    width: 78,
+    height: 78,
+    borderRadius: 39,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "rgba(142,214,177,0.18)",
+    backgroundColor: "rgba(142,214,177,0.045)",
+  },
+  homePresenceCore: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "#E8A33D",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#E8A33D",
+    shadowOpacity: 0.28,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 5,
+  },
+  homePresenceEyes: { flexDirection: "row", gap: 12, marginBottom: 7 },
+  homePresenceEye: { width: 6, height: 8, borderRadius: 4, backgroundColor: "#090C12" },
+  homePresenceMouth: { width: 16, height: 5, borderRadius: 6, backgroundColor: "#090C12" },
+  homePresenceCopy: { marginLeft: 16, flex: 1 },
+  homePresenceLabel: { color: "#E8A33D", fontSize: 10, fontWeight: "800", letterSpacing: 2.2, marginBottom: 5 },
+  homePresenceText: { color: "#D9DCE3", fontSize: 15, lineHeight: 21, maxWidth: 220 },
+
   question: {
     color: "#FFFFFF",
     fontSize: 31,
@@ -2056,16 +2123,16 @@ const styles = StyleSheet.create({
   talkCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(23,29,40,0.88)",
+    backgroundColor: "rgba(18,23,34,0.82)",
     borderRadius: 28,
     padding: 18,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.07)",
+    borderColor: "rgba(255,255,255,0.10)",
     shadowColor: "#000000",
-    shadowOpacity: 0.18,
-    shadowRadius: 24,
+    shadowOpacity: 0.26,
+    shadowRadius: 30,
     shadowOffset: { width: 0, height: 10 },
-    elevation: 5,
+    elevation: 7,
   },
 
   smallCompanion: {
@@ -2110,7 +2177,7 @@ const styles = StyleSheet.create({
 
   checkInArrow: { color: "#E8A33D", fontSize: 24 },
 
-  todayNoteCard: { backgroundColor: "#151A24", borderRadius: 18, padding: 18, marginBottom: 14, borderWidth: 1, borderColor: "#252C39" },
+  todayNoteCard: { backgroundColor: "rgba(18,23,34,0.82)", borderRadius: 24, padding: 19, marginBottom: 14, borderWidth: 1, borderColor: "rgba(255,255,255,0.09)", shadowColor: "#000000", shadowOpacity: 0.16, shadowRadius: 22, shadowOffset: { width: 0, height: 9 }, elevation: 5 },
 
   todayNoteText: { color: "#FFFFFF", fontSize: 16, lineHeight: 23, marginTop: 8 },
 
@@ -2119,12 +2186,17 @@ const styles = StyleSheet.create({
 
   insightHistoryMeta: { color: "#777D89", fontSize: 12, marginTop: -18, marginBottom: 18 },
   insightCard: {
-    backgroundColor: "#151A24",
-    borderRadius: 20,
-    padding: 18,
+    backgroundColor: "rgba(18,23,34,0.82)",
+    borderRadius: 24,
+    padding: 19,
     marginTop: 14,
     borderWidth: 1,
-    borderColor: "#252C39",
+    borderColor: "rgba(185,168,216,0.16)",
+    shadowColor: "#000000",
+    shadowOpacity: 0.16,
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: 9 },
+    elevation: 5,
   },
 
   insightLabel: { color: "#B9A8D8", fontSize: 10, fontWeight: "800", letterSpacing: 1.5 },
@@ -2146,11 +2218,16 @@ const styles = StyleSheet.create({
   },
 
   emptyCard: {
-    backgroundColor: "#151A24",
-    borderRadius: 20,
-    padding: 20,
+    backgroundColor: "rgba(18,23,34,0.82)",
+    borderRadius: 24,
+    padding: 21,
     borderWidth: 1,
-    borderColor: "#252C39",
+    borderColor: "rgba(255,255,255,0.09)",
+    shadowColor: "#000000",
+    shadowOpacity: 0.15,
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: 9 },
+    elevation: 5,
   },
 
   emptyTitle: { color: "#FFFFFF", fontSize: 18, fontWeight: "600", marginBottom: 8 },
@@ -2169,12 +2246,17 @@ const styles = StyleSheet.create({
   secondaryButtonText: { color: "#FFFFFF", fontSize: 13, fontWeight: "600" },
 
   settingsCard: {
-    backgroundColor: "#151A24",
-    borderRadius: 18,
-    padding: 18,
+    backgroundColor: "rgba(18,23,34,0.82)",
+    borderRadius: 22,
+    padding: 19,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#252C39",
+    borderColor: "rgba(255,255,255,0.09)",
+    shadowColor: "#000000",
+    shadowOpacity: 0.13,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4,
   },
 
   settingLabel: { color: "#777D89", fontSize: 10, fontWeight: "800", letterSpacing: 1.5 },
@@ -2226,7 +2308,7 @@ const styles = StyleSheet.create({
   checkInStepText: { color: "#777D89", fontSize: 12, marginBottom: 18 },
   checkInQuestion: { color: "#FFFFFF", fontSize: 30, fontWeight: "600", lineHeight: 37, marginBottom: 10 },
   checkInPrompt: { color: "#A7ACB8", fontSize: 15, lineHeight: 23, marginBottom: 24 },
-  checkInInput: { minHeight: 130, backgroundColor: "#151A24", borderWidth: 1, borderColor: "#252C39", borderRadius: 20, color: "#FFFFFF", fontSize: 17, lineHeight: 25, paddingHorizontal: 18, paddingVertical: 17, textAlignVertical: "top" },
+  checkInInput: { minHeight: 130, backgroundColor: "rgba(18,23,34,0.78)", borderWidth: 1, borderColor: "rgba(255,255,255,0.11)", borderRadius: 24, color: "#FFFFFF", fontSize: 17, lineHeight: 25, paddingHorizontal: 18, paddingVertical: 17, textAlignVertical: "top" },
   checkInMessage: { color: "#E8A33D", fontSize: 13, lineHeight: 19, marginTop: 12 },
   checkInActions: { flexDirection: "row", alignItems: "center", justifyContent: "flex-end", gap: 12, marginTop: 22 },
   backButton: { paddingVertical: 15, paddingHorizontal: 16 },
@@ -2278,24 +2360,24 @@ const styles = StyleSheet.create({
   timeline: { marginTop: 8 },
   timelineItem: { flexDirection: "row", marginBottom: 12 },
   timelineDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#E8A33D", marginTop: 24, marginRight: 12 },
-  timelineCard: { flex: 1, backgroundColor: "#151A24", borderRadius: 18, padding: 16, borderWidth: 1, borderColor: "#252C39" },
+  timelineCard: { flex: 1, backgroundColor: "rgba(18,23,34,0.78)", borderRadius: 22, padding: 17, borderWidth: 1, borderColor: "rgba(255,255,255,0.09)", shadowColor: "#000000", shadowOpacity: 0.12, shadowRadius: 18, shadowOffset: { width: 0, height: 7 }, elevation: 3 },
   timelineCategory: { color: "#E8A33D", fontSize: 9, fontWeight: "800", letterSpacing: 1.3, marginBottom: 6 },
   timelineTitle: { color: "#FFFFFF", fontSize: 16, fontWeight: "600", marginBottom: 5 },
   timelineText: { color: "#A7ACB8", fontSize: 14, lineHeight: 21 },
   timelineDate: { color: "#777D89", fontSize: 11, marginTop: 10 },
   tabBar: {
     position: "absolute",
-    left: 18,
-    right: 18,
-    bottom: 14,
-    height: 68,
-    borderRadius: 28,
-    backgroundColor: "rgba(21,26,36,0.94)",
+    left: 14,
+    right: 14,
+    bottom: 12,
+    height: 72,
+    borderRadius: 30,
+    backgroundColor: "rgba(12,16,25,0.88)",
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.07)",
     shadowColor: "#000000",
-    shadowOpacity: 0.24,
-    shadowRadius: 24,
+    shadowOpacity: 0.30,
+    shadowRadius: 28,
     shadowOffset: { width: 0, height: 8 },
     elevation: 8,
     flexDirection: "row",
@@ -2304,7 +2386,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
 
-  tab: { flex: 1, alignItems: "center", justifyContent: "center", gap: 5 },
+  tab: { flex: 1, height: 56, marginHorizontal: 2, borderRadius: 22, alignItems: "center", justifyContent: "center", gap: 5 },
+  tabActive: { backgroundColor: "rgba(232,163,61,0.10)", borderWidth: 1, borderColor: "rgba(232,163,61,0.16)" },
 
   tabMark: {
     width: 5,
@@ -2313,7 +2396,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#4C5360",
   },
 
-  tabMarkActive: { width: 22, backgroundColor: "#E8A33D" },
+  tabMarkActive: { width: 24, height: 4, backgroundColor: "#E8A33D" },
 
   tabLabel: { color: "#777D89", fontSize: 10, letterSpacing: 0.2 },
 
