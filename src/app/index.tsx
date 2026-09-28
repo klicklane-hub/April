@@ -1058,21 +1058,32 @@ export default function HomeScreen() {
         <View style={styles.statusDot} />
       </View>
 
-      <View style={styles.homePresence}>
-        <View style={styles.homePresenceOuter}>
-          <View style={styles.homePresenceMid}>
-            <View style={styles.homePresenceCore}>
-              <View style={styles.homePresenceEyes}>
-                <View style={styles.homePresenceEye} />
-                <View style={styles.homePresenceEye} />
-              </View>
-              <View style={styles.homePresenceMouth} />
+      <View style={styles.aprilHero}>
+        <View style={styles.aprilHeroOrb}>
+          <View style={styles.orbit orbitA} />
+          <View style={styles.orbit orbitB} />
+          <View style={styles.orbitDot orbitDotA} />
+          <View style={styles.orbitDot orbitDotB} />
+          <View style={styles.aprilAura} />
+          <View style={styles.aprilBotFace}>
+            <View style={styles.aprilBotBrowRow}>
+              <View style={styles.aprilBotBrow} />
+              <View style={styles.aprilBotBrow} />
             </View>
+            <View style={styles.aprilBotEyeRow}>
+              <View style={styles.aprilBotEye}><View style={styles.aprilBotEyeGlow} /></View>
+              <View style={styles.aprilBotEye}><View style={styles.aprilBotEyeGlow} /></View>
+            </View>
+            <View style={styles.aprilBotMouth} />
           </View>
         </View>
-        <View style={styles.homePresenceCopy}>
-          <Text style={styles.homePresenceLabel}>APRIL</Text>
+        <View style={styles.aprilHeroCopy}>
+          <View style={styles.aprilNameRow}>
+            <Text style={styles.homePresenceLabel}>APRIL</Text>
+            <View style={styles.livePill}><View style={styles.liveDot} /><Text style={styles.livePillText}>PRESENT</Text></View>
+          </View>
           <Text style={styles.homePresenceText}>I’m here. Take your time.</Text>
+          <Text style={styles.aprilHeroHint}>A quiet space to talk, reflect and notice your own patterns.</Text>
         </View>
       </View>
 
@@ -1173,15 +1184,21 @@ export default function HomeScreen() {
         Tell me what’s on your mind or how you’re feeling.
       </Text>
 
-      <Animated.View
-        style={[styles.companionGlow, { transform: [{ scale: pulse }] }]}
-      >
-        <View style={styles.companion}>
-          <View style={styles.eyes}>
-            <View style={styles.eye} />
-            <View style={styles.eye} />
+      <Animated.View style={[styles.talkBotStage, { transform: [{ scale: pulse }] }]}>
+        <View style={styles.talkOrbit talkOrbitOne} />
+        <View style={styles.talkOrbit talkOrbitTwo} />
+        <View style={styles.talkOrbitDot} />
+        <View style={styles.talkBotAura} />
+        <View style={styles.talkBotFace}>
+          <View style={styles.aprilBotBrowRow}>
+            <View style={styles.aprilBotBrow} />
+            <View style={styles.aprilBotBrow} />
           </View>
-          <View style={[styles.mouth, isListening && styles.listeningMouth]} />
+          <View style={styles.aprilBotEyeRow}>
+            <View style={styles.aprilBotEye}><View style={styles.aprilBotEyeGlow} /></View>
+            <View style={styles.aprilBotEye}><View style={styles.aprilBotEyeGlow} /></View>
+          </View>
+          <View style={[styles.aprilBotMouth, isListening && styles.aprilBotMouthListening]} />
         </View>
       </Animated.View>
 
@@ -1926,6 +1943,223 @@ const styles = StyleSheet.create({
     color: "#E8A33D",
   },
 
+  aprilHero: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 8,
+    marginBottom: 26,
+  },
+
+  aprilHeroOrb: {
+    width: 156,
+    height: 156,
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+  },
+
+  orbit: {
+    position: "absolute",
+    borderWidth: 1,
+    borderRadius: 999,
+  },
+
+  orbitA: {
+    width: 148,
+    height: 148,
+    borderColor: "rgba(232,163,61,0.34)",
+    transform: [{ rotate: "18deg" }],
+  },
+
+  orbitB: {
+    width: 126,
+    height: 126,
+    borderColor: "rgba(142,214,177,0.22)",
+    transform: [{ rotate: "-24deg" }],
+  },
+
+  orbitDot: {
+    position: "absolute",
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+  },
+
+  orbitDotA: { backgroundColor: "#E8A33D", top: 10, right: 27 },
+  orbitDotB: { backgroundColor: "#8ED6B1", bottom: 18, left: 21 },
+
+  aprilAura: {
+    position: "absolute",
+    width: 112,
+    height: 112,
+    borderRadius: 56,
+    backgroundColor: "rgba(232,163,61,0.13)",
+    borderWidth: 1,
+    borderColor: "rgba(232,163,61,0.18)",
+  },
+
+  aprilBotFace: {
+    width: 88,
+    height: 88,
+    borderRadius: 30,
+    backgroundColor: "#E8A33D",
+    alignItems: "center",
+    justifyContent: "center",
+    transform: [{ rotate: "-3deg" }],
+    shadowColor: "#E8A33D",
+    shadowOpacity: 0.24,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 7 },
+    elevation: 5,
+  },
+
+  aprilBotBrowRow: {
+    flexDirection: "row",
+    gap: 28,
+    marginBottom: 7,
+  },
+
+  aprilBotBrow: {
+    width: 15,
+    height: 3,
+    borderRadius: 3,
+    backgroundColor: "rgba(11,14,20,0.52)",
+  },
+
+  aprilBotEyeRow: {
+    flexDirection: "row",
+    gap: 22,
+    marginBottom: 10,
+  },
+
+  aprilBotEye: {
+    width: 16,
+    height: 21,
+    borderRadius: 8,
+    backgroundColor: "#0B0E14",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  aprilBotEyeGlow: {
+    width: 5,
+    height: 7,
+    borderRadius: 3,
+    backgroundColor: "#FFFFFF",
+    opacity: 0.72,
+  },
+
+  aprilBotMouth: {
+    width: 25,
+    height: 8,
+    borderRadius: 6,
+    backgroundColor: "#0B0E14",
+  },
+
+  aprilBotMouthListening: {
+    width: 13,
+    height: 17,
+    borderRadius: 9,
+  },
+
+  aprilHeroCopy: { flex: 1, paddingLeft: 15 },
+
+  aprilNameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 9,
+    marginBottom: 5,
+  },
+
+  livePill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 10,
+    backgroundColor: "rgba(142,214,177,0.09)",
+    borderWidth: 1,
+    borderColor: "rgba(142,214,177,0.18)",
+  },
+
+  liveDot: { width: 5, height: 5, borderRadius: 3, backgroundColor: "#8ED6B1" },
+  livePillText: { color: "#8ED6B1", fontSize: 8, fontWeight: "800", letterSpacing: 1 },
+
+  aprilHeroHint: { color: "#777D89", fontSize: 11, lineHeight: 17, marginTop: 7 },
+
+  talkBotStage: {
+    width: 224,
+    height: 224,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 34,
+    position: "relative",
+  },
+
+  talkOrbit: {
+    position: "absolute",
+    borderWidth: 1,
+    borderRadius: 999,
+  },
+
+  talkOrbitOne: {
+    width: 214,
+    height: 214,
+    borderColor: "rgba(232,163,61,0.24)",
+    transform: [{ rotate: "20deg" }],
+  },
+
+  talkOrbitTwo: {
+    width: 176,
+    height: 176,
+    borderColor: "rgba(185,168,216,0.22)",
+    transform: [{ rotate: "-28deg" }],
+  },
+
+  talkOrbitDot: {
+    position: "absolute",
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#E8A33D",
+    top: 18,
+    right: 35,
+  },
+
+  talkBotAura: {
+    position: "absolute",
+    width: 154,
+    height: 154,
+    borderRadius: 77,
+    backgroundColor: "rgba(232,163,61,0.12)",
+    borderWidth: 1,
+    borderColor: "rgba(232,163,61,0.2)",
+  },
+
+  talkBotFace: {
+    width: 124,
+    height: 124,
+    borderRadius: 40,
+    backgroundColor: "#E8A33D",
+    alignItems: "center",
+    justifyContent: "center",
+    transform: [{ rotate: "-3deg" }],
+    shadowColor: "#E8A33D",
+    shadowOpacity: 0.3,
+    shadowRadius: 25,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 8,
+  },
+
+  talkContent: {
+    flexGrow: 1,
+    alignItems: "center",
+    paddingHorizontal: 22,
+    paddingTop: 28,
+    paddingBottom: 110,
+  },
+
   companionGlow: {
     width: 210,
     height: 210,
@@ -1949,25 +2183,11 @@ const styles = StyleSheet.create({
 
   eyes: { flexDirection: "row", gap: 32, marginBottom: 20 },
 
-  eye: {
-    width: 14,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: "#0B0E14",
-  },
+  eye: { width: 14, height: 18, borderRadius: 9, backgroundColor: "#0B0E14" },
 
-  mouth: {
-    width: 28,
-    height: 10,
-    borderRadius: 10,
-    backgroundColor: "#0B0E14",
-  },
+  mouth: { width: 28, height: 10, borderRadius: 10, backgroundColor: "#0B0E14" },
 
-  listeningMouth: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-  },
+  listeningMouth: { width: 20, height: 20, borderRadius: 10 },
 
   title: {
     color: "#FFFFFF",
