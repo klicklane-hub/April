@@ -1313,8 +1313,11 @@ export default function HomeScreen() {
         style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
         onPress={handleTalk}
       >
-        <Text style={styles.buttonText}>{isListening ? "I’m done" : "Talk to me"}</Text>
+        <Text style={styles.buttonText}>{isListening ? "I’m finished" : "Talk to me"}</Text>
       </Pressable>
+      {isListening ? (
+        <Text style={styles.talkListeningHint}>Take your time. Pause, think, and keep talking — APRIL will wait.</Text>
+      ) : null}
       {talkError && !isListening ? (
         <Pressable style={styles.newConversationButton} onPress={retryListening}>
           <Text style={styles.newConversationText}>Try again</Text>
