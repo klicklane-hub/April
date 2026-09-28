@@ -1060,10 +1060,10 @@ export default function HomeScreen() {
 
       <View style={styles.aprilHero}>
         <View style={styles.aprilHeroOrb}>
-          <View style={styles.orbit orbitA} />
-          <View style={styles.orbit orbitB} />
-          <View style={styles.orbitDot orbitDotA} />
-          <View style={styles.orbitDot orbitDotB} />
+          <View style={[styles.orbit, styles.orbitA]} />
+          <View style={[styles.orbit, styles.orbitB]} />
+          <View style={[styles.orbitDot, styles.orbitDotA]} />
+          <View style={[styles.orbitDot, styles.orbitDotB]} />
           <View style={styles.aprilAura} />
           <View style={styles.aprilBotFace}>
             <View style={styles.aprilBotBrowRow}>
@@ -1185,8 +1185,8 @@ export default function HomeScreen() {
       </Text>
 
       <Animated.View style={[styles.talkBotStage, { transform: [{ scale: pulse }] }]}>
-        <View style={styles.talkOrbit talkOrbitOne} />
-        <View style={styles.talkOrbit talkOrbitTwo} />
+        <View style={[styles.talkOrbit, styles.talkOrbitOne]} />
+        <View style={[styles.talkOrbit, styles.talkOrbitTwo]} />
         <View style={styles.talkOrbitDot} />
         <View style={styles.talkBotAura} />
         <View style={styles.talkBotFace}>
