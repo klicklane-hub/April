@@ -653,13 +653,10 @@ export default function HomeScreen() {
             <Text style={styles.authLogo}>APRIL</Text>
 
             <View style={styles.authCompanion}>
-              <View style={styles.authPersonShoulders} />
-              <View style={styles.authPersonNeck} />
-              <View style={styles.authPersonHead}>
-                <View style={styles.authPersonHair} />
-                <View style={styles.authPersonEyeLeft} />
-                <View style={styles.authPersonEyeRight} />
-              </View>
+              <View style={styles.presenceRibbonOuter} />
+              <View style={styles.presenceRibbonMid} />
+              <View style={styles.presenceRibbonInner} />
+              <View style={styles.presenceCore}><View style={styles.presenceCoreLight} /></View>
             </View>
 
             <Text style={styles.authTitle}>
@@ -1119,7 +1116,15 @@ export default function HomeScreen() {
     if (aprilAvatar === "orb") {
       if (mode === "talk") return (<><View style={styles.talkPresenceHalo} /><View style={styles.talkPresenceRibbonOne} /><View style={styles.talkPresenceRibbonTwo} /><View style={styles.talkPresenceRibbonThree} /><View style={[styles.talkPresenceCore, isListening && styles.talkPresenceCoreListening]}><View style={styles.talkPresenceCoreLight} /></View><View style={[styles.talkPresenceWave, isListening && styles.talkPresenceWaveActive]} /></>);
       if (mode === "hero") return (<View style={styles.aprilPresence}><View style={styles.presenceRibbonOuter} /><View style={styles.presenceRibbonMid} /><View style={styles.presenceRibbonInner} /><View style={styles.presenceCore}><View style={styles.presenceCoreLight} /></View></View>);
-      return (<View style={[styles.avatarOrbMini, mode === "checkin" && styles.avatarOrbCheckin]}><View style={styles.avatarOrbCore} /></View>);
+      const orbScale = mode === "checkin" ? 0.62 : 0.46;
+      return (
+        <View style={[styles.aprilPresence, { transform: [{ scale: orbScale }] }]}>
+          <View style={styles.presenceRibbonOuter} />
+          <View style={styles.presenceRibbonMid} />
+          <View style={styles.presenceRibbonInner} />
+          <View style={styles.presenceCore}><View style={styles.presenceCoreLight} /></View>
+        </View>
+      );
     }
     const people = {
       "white-man": { skin: "#F1C7A6", shadow: "#DFA982", hair: "#4A3328", highlight: "#72503C", shirt: "#65748B", lip: "#9C625A", eye: "#3A2B25" },
@@ -1921,14 +1926,13 @@ const styles = StyleSheet.create({
   },
 
   authCompanion: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: "rgba(232,163,61,0.13)",
+    width: 156,
+    height: 156,
     alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 28,
+    position: "relative",
   },
 
   authCore: {
