@@ -1643,6 +1643,14 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View pointerEvents="none" style={styles.backgroundArt}>
+        <View style={styles.backgroundRingOne} />
+        <View style={styles.backgroundRingTwo} />
+        <View style={styles.backgroundWaveOne} />
+        <View style={styles.backgroundWaveTwo} />
+        <View style={styles.backgroundDotOne} />
+        <View style={styles.backgroundDotTwo} />
+      </View>
       <View style={styles.appShell}>
         {renderActiveScreen()}
         <View style={styles.tabBar}>
@@ -1667,6 +1675,72 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   container: { flex: 1, backgroundColor: "#0B0E14" },
+
+  backgroundArt: {
+    ...StyleSheet.absoluteFillObject,
+    overflow: "hidden",
+    opacity: 0.7,
+  },
+  backgroundRingOne: {
+    position: "absolute",
+    width: 420,
+    height: 420,
+    borderRadius: 210,
+    borderWidth: 1,
+    borderColor: "rgba(232,163,61,0.08)",
+    top: -150,
+    right: -150,
+  },
+  backgroundRingTwo: {
+    position: "absolute",
+    width: 560,
+    height: 560,
+    borderRadius: 280,
+    borderWidth: 1,
+    borderColor: "rgba(185,168,216,0.07)",
+    bottom: -260,
+    left: -250,
+  },
+  backgroundWaveOne: {
+    position: "absolute",
+    width: 700,
+    height: 220,
+    borderRadius: 110,
+    borderWidth: 1,
+    borderColor: "rgba(142,214,177,0.055)",
+    transform: [{ rotate: "-18deg" }],
+    top: 220,
+    left: -260,
+  },
+  backgroundWaveTwo: {
+    position: "absolute",
+    width: 620,
+    height: 190,
+    borderRadius: 100,
+    borderWidth: 1,
+    borderColor: "rgba(232,163,61,0.05)",
+    transform: [{ rotate: "14deg" }],
+    bottom: 170,
+    right: -300,
+  },
+  backgroundDotOne: {
+    position: "absolute",
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: "rgba(232,163,61,0.16)",
+    top: 150,
+    left: 34,
+  },
+  backgroundDotTwo: {
+    position: "absolute",
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: "rgba(185,168,216,0.15)",
+    bottom: 250,
+    right: 42,
+  },
   center: { flex: 1, alignItems: "center", justifyContent: "center" },
   loadingText: { color: "#A7ACB8", marginTop: 14, fontSize: 15 },
 
@@ -1914,8 +1988,8 @@ const styles = StyleSheet.create({
 
   dashboardContent: {
     paddingHorizontal: 22,
-    paddingTop: 28,
-    paddingBottom: 110,
+    paddingTop: 32,
+    paddingBottom: 120,
   },
 
   dashboardHeader: {
@@ -1929,8 +2003,9 @@ const styles = StyleSheet.create({
 
   greeting: {
     color: "#FFFFFF",
-    fontSize: 30,
+    fontSize: 34,
     fontWeight: "600",
+    letterSpacing: -0.6,
     marginTop: 5,
   },
 
@@ -1943,10 +2018,11 @@ const styles = StyleSheet.create({
 
   question: {
     color: "#FFFFFF",
-    fontSize: 27,
+    fontSize: 31,
     fontWeight: "600",
-    lineHeight: 34,
-    marginBottom: 8,
+    lineHeight: 38,
+    letterSpacing: -0.5,
+    marginBottom: 10,
   },
 
   dashboardSubtitle: {
@@ -1959,11 +2035,16 @@ const styles = StyleSheet.create({
   talkCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#171D28",
-    borderRadius: 22,
+    backgroundColor: "rgba(23,29,40,0.88)",
+    borderRadius: 28,
     padding: 18,
     borderWidth: 1,
-    borderColor: "#252C39",
+    borderColor: "rgba(255,255,255,0.07)",
+    shadowColor: "#000000",
+    shadowOpacity: 0.18,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 5,
   },
 
   smallCompanion: {
@@ -2183,14 +2264,19 @@ const styles = StyleSheet.create({
   timelineDate: { color: "#777D89", fontSize: 11, marginTop: 10 },
   tabBar: {
     position: "absolute",
-    left: 12,
-    right: 12,
-    bottom: 10,
-    height: 72,
-    borderRadius: 24,
-    backgroundColor: "#151A24",
+    left: 18,
+    right: 18,
+    bottom: 14,
+    height: 68,
+    borderRadius: 28,
+    backgroundColor: "rgba(21,26,36,0.94)",
     borderWidth: 1,
-    borderColor: "#252C39",
+    borderColor: "rgba(255,255,255,0.07)",
+    shadowColor: "#000000",
+    shadowOpacity: 0.24,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 8,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-around",
@@ -2206,9 +2292,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#4C5360",
   },
 
-  tabMarkActive: { width: 18, backgroundColor: "#E8A33D" },
+  tabMarkActive: { width: 22, backgroundColor: "#E8A33D" },
 
-  tabLabel: { color: "#777D89", fontSize: 10 },
+  tabLabel: { color: "#777D89", fontSize: 10, letterSpacing: 0.2 },
 
   tabLabelActive: { color: "#FFFFFF", fontWeight: "600" },
 });
