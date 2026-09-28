@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Alert,
   Animated,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -1126,51 +1127,21 @@ export default function HomeScreen() {
         </View>
       );
     }
-    const people = {
-      "white-man": { skin: "#F1C7A6", shadow: "#DFA982", hair: "#4A3328", highlight: "#72503C", shirt: "#65748B", lip: "#9C625A", eye: "#3A2B25" },
-      "colored-man": { skin: "#8A563F", shadow: "#714432", hair: "#171515", highlight: "#302725", shirt: "#596B63", lip: "#6F3D3D", eye: "#241C19" },
-      "white-woman": { skin: "#F2CBB1", shadow: "#E0AA89", hair: "#6B4632", highlight: "#9A6B4E", shirt: "#B9A8D8", lip: "#A85E68", eye: "#40302A" },
-      "colored-woman": { skin: "#9A624A", shadow: "#7C4937", hair: "#171414", highlight: "#3B2824", shirt: "#8ED6B1", lip: "#743B42", eye: "#211816" },
+    const scale = mode === "talk" ? 1.0 : mode === "hero" ? 0.86 : mode === "checkin" ? 0.52 : 0.38;
+    const portraitPosition = {
+      "white-man": { left: 0, top: 0 },
+      "colored-man": { left: -154, top: 0 },
+      "white-woman": { left: 0, top: -154 },
+      "colored-woman": { left: -154, top: -154 },
     } as const;
-    const p = people[aprilAvatar];
+    const position = portraitPosition[aprilAvatar];
     return (
-      <View style={[styles.humanAvatar, { transform: [{ scale }] }]}>
-        <View style={styles.humanAura} />
-        <View style={[styles.humanTorso, { backgroundColor: p.shirt }]} />
-        <View style={styles.humanTorsoPanel} />
-        <View style={[styles.humanNeck, { backgroundColor: p.shadow }]} />
-        <View style={styles.humanNeckShadow} />
-        <View style={[styles.humanEar, { backgroundColor: p.skin, left: 31 }]}>
-          <View style={[styles.humanEarInner, { borderColor: p.shadow, left: 3, top: 5 }]} />
-        </View>
-        <View style={[styles.humanEar, { backgroundColor: p.skin, right: 31, left: undefined }]}>
-          <View style={[styles.humanEarInner, { borderColor: p.shadow, right: 3, top: 5 }]} />
-        </View>
-        <View style={[styles.humanHead, { backgroundColor: p.skin }]}>
-          <View style={[styles.humanFaceShade, { backgroundColor: p.shadow }]} />
-          <View style={[styles.humanCheek, { backgroundColor: p.lip, left: 15 }]} />
-          <View style={[styles.humanCheek, { backgroundColor: p.lip, right: 15, left: undefined }]} />
-          <View style={[styles.humanHairBack, { backgroundColor: p.hair }]} />
-          <View style={[styles.humanHairTop, { backgroundColor: p.hair }]} />
-          <View style={[styles.humanHairSide, { backgroundColor: p.hair, left: -2 }]} />
-          <View style={[styles.humanHairSide, { backgroundColor: p.hair, right: -2, left: undefined }]} />
-          <View style={[styles.humanHairHighlight, { backgroundColor: p.highlight }]} />
-          <View style={[styles.humanBrow, { backgroundColor: p.eye, left: 25, transform: [{ rotate: "-4deg" }] }]} />
-          <View style={[styles.humanBrow, { backgroundColor: p.eye, right: 25, left: undefined, transform: [{ rotate: "4deg" }] }]} />
-          <View style={[styles.humanEye, { left: 24 }]}>
-            <View style={[styles.humanIris, { backgroundColor: p.eye }]}><View style={[styles.humanPupil, { backgroundColor: "#0B0E14" }]} /></View>
-          </View>
-          <View style={[styles.humanEye, { right: 24, left: undefined }]}>
-            <View style={[styles.humanIris, { backgroundColor: p.eye }]}><View style={[styles.humanPupil, { backgroundColor: "#0B0E14" }]} /></View>
-          </View>
-          <View style={[styles.humanNoseBridge, { borderColor: p.shadow }]} />
-          <View style={[styles.humanNostril, { backgroundColor: p.eye, left: 39 }]} />
-          <View style={[styles.humanNostril, { backgroundColor: p.eye, right: 39, left: undefined }]} />
-          <View style={[styles.humanLipUpper, { backgroundColor: p.lip }]} />
-          <View style={[styles.humanLipLower, { backgroundColor: p.lip }]} />
-          <View style={[styles.humanChin, { backgroundColor: p.shadow }]} />
-        </View>
-        <View style={[styles.humanCollar, { borderColor: p.shirt }]} />
+      <View style={[styles.humanPortrait, { transform: [{ scale }] }]}>
+        <Image
+          source={{ uri: "/avatars/april-avatars-sheet.jpg" }}
+          style={[styles.humanPortraitImage, { left: position.left, top: position.top }]}
+          resizeMode="stretch"
+        />
       </View>
     );
   };
@@ -1766,7 +1737,7 @@ export default function HomeScreen() {
                 }
               }}
             >
-              <View style={styles.avatarChoicePreview}>{renderAprilCompanion(value === "orb" ? "small" : "checkin")}</View>
+              <View style={styles.avatarChoicePreview}>{renderAprilCompanion("small")}</View>
               <Text style={[styles.avatarChoiceLabel, aprilAvatar === value && styles.avatarChoiceLabelActive]}>{label}</Text>
               {aprilAvatar === value ? <Text style={styles.avatarChoiceCheck}>✓</Text> : null}
             </Pressable>
@@ -2180,8 +2151,8 @@ const styles = StyleSheet.create({
 
   aprilPresenceSlot: { width: 156, height: 156, alignItems: "center", justifyContent: "center" },
 
-  humanAvatar: { width: 170, height: 192, alignItems: "center", justifyContent: "flex-end", position: "relative" },
-  humanAura: { position: "absolute", top: 2, width: 166, height: 166, borderRadius: 83, backgroundColor: "rgba(232,163,61,0.035)", borderWidth: 1, borderColor: "rgba(232,163,61,0.10)" },
+  humanPortrait: { width: 154, height: 170, overflow: "hidden", borderRadius: 28, backgroundColor: "#111620", shadowColor: "#000000", shadowOpacity: 0.22, shadowRadius: 14, shadowOffset: { width: 0, height: 6 }, elevation: 4 },
+  humanPortraitImage: { position: "absolute", width: 308, height: 308 },
   humanTorso: { position: "absolute", bottom: 0, width: 136, height: 72, borderTopLeftRadius: 32, borderTopRightRadius: 32, borderBottomLeftRadius: 18, borderBottomRightRadius: 18, shadowColor: "#000000", shadowOpacity: 0.16, shadowRadius: 10, shadowOffset: { width: 0, height: 5 }, elevation: 3 },
   humanTorsoPanel: { position: "absolute", bottom: 0, width: 96, height: 62, borderTopLeftRadius: 22, borderTopRightRadius: 22, borderBottomLeftRadius: 12, borderBottomRightRadius: 12, backgroundColor: "rgba(255,255,255,0.10)" },
   humanNeck: { position: "absolute", bottom: 57, width: 30, height: 38, borderRadius: 11 },
