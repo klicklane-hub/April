@@ -1112,9 +1112,10 @@ export default function HomeScreen() {
   };
 
 
-  const renderAprilCompanion = (mode: "hero" | "talk" | "small" | "checkin") => {
+  const renderAprilCompanion = (mode: "hero" | "talk" | "small" | "checkin", avatarOverride?: typeof aprilAvatar) => {
+    const activeAvatar = avatarOverride ?? aprilAvatar;
     const scale = mode === "talk" ? 1.08 : mode === "hero" ? 0.92 : mode === "checkin" ? 0.66 : 0.42;
-    if (aprilAvatar === "orb") {
+    if (activeAvatar === "orb") {
       if (mode === "talk") return (<><View style={styles.talkPresenceHalo} /><View style={styles.talkPresenceRibbonOne} /><View style={styles.talkPresenceRibbonTwo} /><View style={styles.talkPresenceRibbonThree} /><View style={[styles.talkPresenceCore, isListening && styles.talkPresenceCoreListening]}><View style={styles.talkPresenceCoreLight} /></View><View style={[styles.talkPresenceWave, isListening && styles.talkPresenceWaveActive]} /></>);
       if (mode === "hero") return (<View style={styles.aprilPresence}><View style={styles.presenceRibbonOuter} /><View style={styles.presenceRibbonMid} /><View style={styles.presenceRibbonInner} /><View style={styles.presenceCore}><View style={styles.presenceCoreLight} /></View></View>);
       const orbScale = mode === "checkin" ? 0.62 : 0.46;
@@ -1134,7 +1135,7 @@ export default function HomeScreen() {
       "white-woman": "https://randomuser.me/api/portraits/women/44.jpg",
       "colored-woman": "https://randomuser.me/api/portraits/women/65.jpg",
     };
-    const portraitSource = portraitSources[aprilAvatar];
+    const portraitSource = portraitSources[activeAvatar];
 
     return (
       <View style={[styles.humanPortrait, { transform: [{ scale: portraitScale }] }]}>
@@ -1737,7 +1738,7 @@ export default function HomeScreen() {
                 }
               }}
             >
-              <View style={styles.avatarChoicePreview}>{renderAprilCompanion("small")}</View>
+              <View style={styles.avatarChoicePreview}>{renderAprilCompanion("small", value)}</View>
               <Text style={[styles.avatarChoiceLabel, aprilAvatar === value && styles.avatarChoiceLabelActive]}>{label}</Text>
               {aprilAvatar === value ? <Text style={styles.avatarChoiceCheck}>✓</Text> : null}
             </Pressable>
