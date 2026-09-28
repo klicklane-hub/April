@@ -1128,23 +1128,23 @@ export default function HomeScreen() {
       );
     }
     const portraitScale = mode === "talk" ? 1.0 : mode === "hero" ? 0.86 : mode === "checkin" ? 0.52 : 0.38;
-    const portraitPosition = {
-      "white-man": { left: 0, top: 0 },
-      "colored-man": { left: -154, top: 0 },
-      "white-woman": { left: 0, top: -154 },
-      "colored-woman": { left: -154, top: -154 },
-    } as const;
-    const position = portraitPosition[aprilAvatar];
+    const portraitSources = {
+      "white-man": "https://randomuser.me/api/portraits/men/32.jpg",
+      "colored-man": "https://randomuser.me/api/portraits/men/75.jpg",
+      "white-woman": "https://randomuser.me/api/portraits/women/44.jpg",
+      "colored-woman": "https://randomuser.me/api/portraits/women/65.jpg",
+    };
+    const portraitSource = portraitSources[aprilAvatar];
+
     return (
       <View style={[styles.humanPortrait, { transform: [{ scale: portraitScale }] }]}>
         <Image
-          source={{ uri: "/avatars/april-avatars-sheet.jpg" }}
-          style={[styles.humanPortraitImage, { left: position.left, top: position.top }]}
-          resizeMode="stretch"
+          source={{ uri: portraitSource }}
+          style={styles.humanPortraitImage}
+          resizeMode="cover"
         />
       </View>
-    );
-  };
+    );  };
   const renderHome = () => (
     <ScrollView contentContainerStyle={styles.dashboardContent}>
       <View style={styles.dashboardHeader}>
@@ -2152,7 +2152,7 @@ const styles = StyleSheet.create({
   aprilPresenceSlot: { width: 156, height: 156, alignItems: "center", justifyContent: "center" },
 
   humanPortrait: { width: 154, height: 170, overflow: "hidden", borderRadius: 28, backgroundColor: "#111620", shadowColor: "#000000", shadowOpacity: 0.22, shadowRadius: 14, shadowOffset: { width: 0, height: 6 }, elevation: 4 },
-  humanPortraitImage: { position: "absolute", width: 308, height: 308 },
+  humanPortraitImage: { width: "100%", height: "100%" },
   humanTorso: { position: "absolute", bottom: 0, width: 136, height: 72, borderTopLeftRadius: 32, borderTopRightRadius: 32, borderBottomLeftRadius: 18, borderBottomRightRadius: 18, shadowColor: "#000000", shadowOpacity: 0.16, shadowRadius: 10, shadowOffset: { width: 0, height: 5 }, elevation: 3 },
   humanTorsoPanel: { position: "absolute", bottom: 0, width: 96, height: 62, borderTopLeftRadius: 22, borderTopRightRadius: 22, borderBottomLeftRadius: 12, borderBottomRightRadius: 12, backgroundColor: "rgba(255,255,255,0.10)" },
   humanNeck: { position: "absolute", bottom: 57, width: 30, height: 38, borderRadius: 11 },
