@@ -572,6 +572,14 @@ export default function HomeScreen() {
   if (!sessionUser) {
     return (
       <SafeAreaView style={styles.container}>
+        <View pointerEvents="none" style={styles.authBackgroundArt}>
+          <View style={styles.backgroundRingOne} />
+          <View style={styles.backgroundRingTwo} />
+          <View style={styles.backgroundWaveOne} />
+          <View style={styles.backgroundWaveTwo} />
+          <View style={styles.backgroundDotOne} />
+          <View style={styles.backgroundDotTwo} />
+        </View>
         <KeyboardAvoidingView
           style={styles.flex}
           behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -678,6 +686,14 @@ export default function HomeScreen() {
   if (needsOnboarding) {
     return (
       <SafeAreaView style={styles.container}>
+        <View pointerEvents="none" style={styles.authBackgroundArt}>
+          <View style={styles.backgroundRingOne} />
+          <View style={styles.backgroundRingTwo} />
+          <View style={styles.backgroundWaveOne} />
+          <View style={styles.backgroundWaveTwo} />
+          <View style={styles.backgroundDotOne} />
+          <View style={styles.backgroundDotTwo} />
+        </View>
         <KeyboardAvoidingView
           style={styles.flex}
           behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -1676,6 +1692,11 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   container: { flex: 1, backgroundColor: "#0B0E14" },
 
+  authBackgroundArt: {
+    ...StyleSheet.absoluteFillObject,
+    overflow: "hidden",
+    opacity: 0.92,
+  },
   backgroundArt: {
     ...StyleSheet.absoluteFillObject,
     overflow: "hidden",
