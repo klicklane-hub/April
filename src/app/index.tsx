@@ -1136,20 +1136,38 @@ export default function HomeScreen() {
     return (
       <View style={[styles.humanAvatar, { transform: [{ scale }] }]}>
         <View style={styles.humanAura} />
-        <View style={[styles.humanShoulders, { backgroundColor: p.shirt }]} />
+        <View style={[styles.humanTorso, { backgroundColor: p.shirt }]} />
+        <View style={styles.humanTorsoPanel} />
         <View style={[styles.humanNeck, { backgroundColor: p.shadow }]} />
-        <View style={[styles.humanEar, { backgroundColor: p.skin }]} />
-        <View style={[styles.humanEar, { backgroundColor: p.skin, right: 24, left: undefined }]} />
+        <View style={styles.humanNeckShadow} />
+        <View style={[styles.humanEar, { backgroundColor: p.skin, left: 31 }]}>
+          <View style={[styles.humanEarInner, { borderColor: p.shadow, left: 3, top: 5 }]} />
+        </View>
+        <View style={[styles.humanEar, { backgroundColor: p.skin, right: 31, left: undefined }]}>
+          <View style={[styles.humanEarInner, { borderColor: p.shadow, right: 3, top: 5 }]} />
+        </View>
         <View style={[styles.humanHead, { backgroundColor: p.skin }]}>
+          <View style={[styles.humanFaceShade, { backgroundColor: p.shadow }]} />
+          <View style={[styles.humanCheek, { backgroundColor: p.lip, left: 15 }]} />
+          <View style={[styles.humanCheek, { backgroundColor: p.lip, right: 15, left: undefined }]} />
           <View style={[styles.humanHairBack, { backgroundColor: p.hair }]} />
           <View style={[styles.humanHairTop, { backgroundColor: p.hair }]} />
+          <View style={[styles.humanHairSide, { backgroundColor: p.hair, left: -2 }]} />
+          <View style={[styles.humanHairSide, { backgroundColor: p.hair, right: -2, left: undefined }]} />
           <View style={[styles.humanHairHighlight, { backgroundColor: p.highlight }]} />
-          <View style={[styles.humanBrow, { backgroundColor: p.eye, left: 27 }]} />
-          <View style={[styles.humanBrow, { backgroundColor: p.eye, right: 27, left: undefined }]} />
-          <View style={[styles.humanEye, { left: 27 }]}><View style={[styles.humanPupil, { backgroundColor: p.eye }]} /></View>
-          <View style={[styles.humanEye, { right: 27, left: undefined }]}><View style={[styles.humanPupil, { backgroundColor: p.eye }]} /></View>
-          <View style={[styles.humanNose, { borderColor: p.shadow }]} />
-          <View style={[styles.humanMouth, { backgroundColor: p.lip }]} />
+          <View style={[styles.humanBrow, { backgroundColor: p.eye, left: 25, transform: [{ rotate: "-4deg" }] }]} />
+          <View style={[styles.humanBrow, { backgroundColor: p.eye, right: 25, left: undefined, transform: [{ rotate: "4deg" }] }]} />
+          <View style={[styles.humanEye, { left: 24 }]}>
+            <View style={[styles.humanIris, { backgroundColor: p.eye }]}><View style={[styles.humanPupil, { backgroundColor: "#0B0E14" }]} /></View>
+          </View>
+          <View style={[styles.humanEye, { right: 24, left: undefined }]}>
+            <View style={[styles.humanIris, { backgroundColor: p.eye }]}><View style={[styles.humanPupil, { backgroundColor: "#0B0E14" }]} /></View>
+          </View>
+          <View style={[styles.humanNoseBridge, { borderColor: p.shadow }]} />
+          <View style={[styles.humanNostril, { backgroundColor: p.eye, left: 39 }]} />
+          <View style={[styles.humanNostril, { backgroundColor: p.eye, right: 39, left: undefined }]} />
+          <View style={[styles.humanLipUpper, { backgroundColor: p.lip }]} />
+          <View style={[styles.humanLipLower, { backgroundColor: p.lip }]} />
           <View style={[styles.humanChin, { backgroundColor: p.shadow }]} />
         </View>
         <View style={[styles.humanCollar, { borderColor: p.shirt }]} />
@@ -1725,7 +1743,7 @@ export default function HomeScreen() {
       <View style={styles.settingsCard}>
         <Text style={styles.settingLabel}>APRIL APPEARANCE</Text>
         <Text style={styles.settingValue}>Choose your APRIL</Text>
-        <Text style={styles.settingHint}>Pick the presence that feels most comfortable to you. Your choice changes the visual companion, not how APRIL supports you.</Text>
+        <Text style={styles.settingHint}>You can change your APRIL anytime. Pick the presence that feels most comfortable to you.</Text>
         <View style={styles.avatarPicker}>
           {([
             ["orb", "Orb"],
@@ -2162,22 +2180,31 @@ const styles = StyleSheet.create({
 
   aprilPresenceSlot: { width: 156, height: 156, alignItems: "center", justifyContent: "center" },
 
-  humanAvatar: { width: 150, height: 174, alignItems: "center", justifyContent: "flex-end", position: "relative" },
-  humanAura: { position: "absolute", top: 5, width: 148, height: 148, borderRadius: 74, backgroundColor: "rgba(232,163,61,0.045)", borderWidth: 1, borderColor: "rgba(232,163,61,0.13)" },
-  humanShoulders: { position: "absolute", bottom: 0, width: 144, height: 67, borderTopLeftRadius: 62, borderTopRightRadius: 62, borderBottomLeftRadius: 20, borderBottomRightRadius: 20 },
-  humanNeck: { position: "absolute", bottom: 54, width: 34, height: 34, borderRadius: 13 },
-  humanHead: { width: 92, height: 108, borderRadius: 45, position: "relative", overflow: "hidden", marginBottom: 19, shadowColor: "#000000", shadowOpacity: 0.18, shadowRadius: 12, shadowOffset: { width: 0, height: 5 }, elevation: 4 },
-  humanHairBack: { position: "absolute", top: 2, left: -5, right: -5, height: 64, borderRadius: 38 },
-  humanHairTop: { position: "absolute", top: -13, left: 6, right: 6, height: 51, borderRadius: 28 },
-  humanHairHighlight: { position: "absolute", top: 5, left: 19, width: 30, height: 12, borderRadius: 8, opacity: 0.55 },
-  humanBrow: { position: "absolute", top: 45, width: 18, height: 3, borderRadius: 3 },
-  humanEye: { position: "absolute", top: 51, width: 17, height: 9, borderRadius: 9, backgroundColor: "#F8F4EF", alignItems: "center", justifyContent: "center" },
-  humanPupil: { width: 5, height: 7, borderRadius: 4 },
-  humanNose: { position: "absolute", top: 58, left: 43, width: 8, height: 19, borderRightWidth: 1.5, borderBottomWidth: 1.5, borderRadius: 5 },
-  humanMouth: { position: "absolute", top: 82, left: 35, width: 23, height: 6, borderRadius: 8 },
-  humanChin: { position: "absolute", top: 90, left: 39, width: 15, height: 7, borderRadius: 8, opacity: 0.24 },
-  humanEar: { position: "absolute", bottom: 58, left: 24, width: 10, height: 22, borderRadius: 6 },
-  humanCollar: { position: "absolute", bottom: 49, width: 48, height: 16, borderTopWidth: 2, borderRadius: 24, opacity: 0.55 },
+  humanAvatar: { width: 170, height: 192, alignItems: "center", justifyContent: "flex-end", position: "relative" },
+  humanAura: { position: "absolute", top: 2, width: 166, height: 166, borderRadius: 83, backgroundColor: "rgba(232,163,61,0.035)", borderWidth: 1, borderColor: "rgba(232,163,61,0.10)" },
+  humanTorso: { position: "absolute", bottom: 0, width: 136, height: 72, borderTopLeftRadius: 32, borderTopRightRadius: 32, borderBottomLeftRadius: 18, borderBottomRightRadius: 18, shadowColor: "#000000", shadowOpacity: 0.16, shadowRadius: 10, shadowOffset: { width: 0, height: 5 }, elevation: 3 },
+  humanTorsoPanel: { position: "absolute", bottom: 0, width: 96, height: 62, borderTopLeftRadius: 22, borderTopRightRadius: 22, borderBottomLeftRadius: 12, borderBottomRightRadius: 12, backgroundColor: "rgba(255,255,255,0.10)" },
+  humanNeck: { position: "absolute", bottom: 57, width: 30, height: 38, borderRadius: 11 },
+  humanNeckShadow: { position: "absolute", bottom: 57, width: 13, height: 35, borderRadius: 8, backgroundColor: "rgba(0,0,0,0.10)" },
+  humanEar: { position: "absolute", bottom: 91, width: 12, height: 25, borderRadius: 7 },
+  humanEarInner: { position: "absolute", width: 6, height: 13, borderRadius: 5, borderWidth: 1, opacity: 0.35 },
+  humanHead: { width: 94, height: 112, borderRadius: 43, position: "relative", overflow: "hidden", marginBottom: 18, shadowColor: "#000000", shadowOpacity: 0.20, shadowRadius: 13, shadowOffset: { width: 0, height: 6 }, elevation: 4 },
+  humanFaceShade: { position: "absolute", bottom: 4, left: 7, right: 7, height: 48, borderRadius: 30, opacity: 0.16 },
+  humanCheek: { position: "absolute", top: 70, width: 18, height: 10, borderRadius: 9, opacity: 0.16 },
+  humanHairBack: { position: "absolute", top: -2, left: -8, right: -8, height: 70, borderRadius: 38 },
+  humanHairTop: { position: "absolute", top: -16, left: 4, right: 4, height: 56, borderRadius: 30 },
+  humanHairSide: { position: "absolute", top: 28, width: 17, height: 58, borderRadius: 13 },
+  humanHairHighlight: { position: "absolute", top: 5, left: 18, width: 34, height: 12, borderRadius: 8, opacity: 0.48 },
+  humanBrow: { position: "absolute", top: 44, width: 19, height: 3, borderRadius: 3 },
+  humanEye: { position: "absolute", top: 51, width: 19, height: 11, borderRadius: 10, backgroundColor: "#F8F4EF", alignItems: "center", justifyContent: "center" },
+  humanIris: { width: 8, height: 8, borderRadius: 4, alignItems: "center", justifyContent: "center" },
+  humanPupil: { width: 4, height: 6, borderRadius: 3 },
+  humanNoseBridge: { position: "absolute", top: 57, left: 44, width: 7, height: 20, borderLeftWidth: 1, borderBottomWidth: 1, borderRadius: 5, opacity: 0.55 },
+  humanNostril: { position: "absolute", top: 74, width: 4, height: 2, borderRadius: 2, opacity: 0.45 },
+  humanLipUpper: { position: "absolute", top: 83, left: 35, width: 25, height: 4, borderRadius: 5 },
+  humanLipLower: { position: "absolute", top: 87, left: 37, width: 21, height: 6, borderRadius: 7, opacity: 0.82 },
+  humanChin: { position: "absolute", top: 94, left: 39, width: 16, height: 6, borderRadius: 8, opacity: 0.20 },
+  humanCollar: { position: "absolute", bottom: 51, width: 54, height: 18, borderTopWidth: 2, borderRadius: 24, opacity: 0.55 },
   avatarOrbMini: { width: 68, height: 68, borderRadius: 34, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: "rgba(232,163,61,0.24)", backgroundColor: "rgba(232,163,61,0.06)" },
   avatarOrbCheckin: { width: 92, height: 92, borderRadius: 46 },
   avatarOrbCore: { width: 40, height: 40, borderRadius: 20, backgroundColor: "#E8A33D", shadowColor: "#E8A33D", shadowOpacity: 0.34, shadowRadius: 18, shadowOffset: { width: 0, height: 5 }, elevation: 5 },
